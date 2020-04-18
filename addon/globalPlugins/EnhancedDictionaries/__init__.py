@@ -36,9 +36,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		super(GlobalPlugin, self).__init__(*args, **kwargs)
 		log.debug("constructor")
 		self.injectProcessing()
-
 	
-
 	# the method below is responsible for modifying NVDA behavior.
 	# we need that certain parts of NVDA behave differently than the original to insert our functionality
 	# for example, dictionaries menus need to activate our enhanced dictionary dialog and
@@ -59,6 +57,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		standardDictionaryMenu = guiHelper.getDefaultDictionaryMenu()
 		voiceDictionaryMenu = guiHelper.getVoiceDictionaryMenu()
 		guiHelper.rebindMenu(standardDictionaryMenu, self.onDefaultDictionaryCommand)
+		guiHelper.rebindMenu(voiceDictionaryMenu, self.onVoiceDictionaryCommand)
 
 	def onDefaultDictionaryCommand(self, evt):
 		# linting is complaining about from .settingsDialogs import * names
@@ -66,8 +65,21 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		log.debug("chamasticocact")
 		dic = dictHelper.getDictionary("default")
 		# Translators: Title for default speech dictionary dialog.
-		guiHelper.showDefaultDialog(dic)
+		guiHelper.showEnhancedDictionaryDialog(dic)
 
+	def onVoiceDictionaryCommand(self,evt):
+		from synthDriverHandler import getSynth
+		synth = getSynth()
+		if synth.isSupported("voice"):
+			voiceName = f"{synth.name}-{synth.availableVoices[synth.voice].displayName}"
+		else:
+			voiceName = synth.name
+		# linting is complaining about from .settingsDialogs import * names
+		# too risky to change it all, so we will specify what we want on a method based aproach
+		dic = dictHelper.getDictionary("voice")
+		# Translators: Title for voice dictionary for the current voice such as current eSpeak variant.
+		guiHelper.showEnhancedDictionaryDialog(dic, _("Voice dictionary (%s)") % voiceName)
+	
 	@script(description="Moves to parent in tree view.", gestures=['kb:NVDA+alt+a'])
 	def script_moveToParent(self, gesture):
 		ui.message(_("&Default dictionary..."))

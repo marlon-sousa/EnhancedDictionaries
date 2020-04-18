@@ -52,8 +52,8 @@ def rebindMenu(menu, handler):
 	gui.mainFrame.sysTrayIcon.Unbind(wx.EVT_MENU, menu)
 	gui.mainFrame.sysTrayIcon.Bind(wx.EVT_MENU, handler, menu)
 
-def showDefaultDialog(dic):
-	gui.mainFrame._popupSettingsDialog(EnhancedDictionaryDialog, _("Default dictionary"), dic)
+def showEnhancedDictionaryDialog(dic, title = None):
+	gui.mainFrame._popupSettingsDialog(EnhancedDictionaryDialog, title or _("Default dictionary"), dic)
 
 # This is our new dictionary dialog.
 # it presents the following changes compared to the original dialog:
