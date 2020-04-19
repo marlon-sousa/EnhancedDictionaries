@@ -11,9 +11,6 @@ from . import guiHelper
 import globalPluginHandler
 import globalVars
 from logHandler import log
-import ui
-import scriptHandler
-from scriptHandler import script
 
 
 def _handlePostConfigProfileSwitch(resetSpeechIfNeeded=True):
@@ -28,9 +25,13 @@ def getActiveProfile(self):
 	log.debug(f"will return {self.profiles[-1].name}")
 	return self.profiles[-1]
 
+# for detailed explanations, see guiHelper.py file
+__ = _
+
+addonHandler.initTranslation()
+
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
-	scriptCategory = _("BluetoothAudio")
 
 	def __init__(self, *args, **kwargs):
 		super(GlobalPlugin, self).__init__(*args, **kwargs)
@@ -64,7 +65,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		# too risky to change it all, so we will specify what we want on a method based aproach
 		log.debug("chamasticocact")
 		dic = dictHelper.getDictionary("default")
-		# Translators: Title for default speech dictionary dialog.
 		guiHelper.showEnhancedDictionaryDialog(dic)
 
 	def onVoiceDictionaryCommand(self,evt):
@@ -78,9 +78,4 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		# too risky to change it all, so we will specify what we want on a method based aproach
 		dic = dictHelper.getDictionary("voice")
 		# Translators: Title for voice dictionary for the current voice such as current eSpeak variant.
-		guiHelper.showEnhancedDictionaryDialog(dic, _("Voice dictionary (%s)") % voiceName)
-	
-	@script(description="Moves to parent in tree view.", gestures=['kb:NVDA+alt+a'])
-	def script_moveToParent(self, gesture):
-		ui.message(_("&Default dictionary..."))
-    
+		guiHelper.showEnhancedDictionaryDialog(dic, __("Voice dictionary (%s)") % voiceName)

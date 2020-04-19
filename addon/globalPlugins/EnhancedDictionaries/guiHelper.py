@@ -4,6 +4,7 @@
 #This file is covered by the GNU General Public License.
 #See the file COPYING.txt for more details.
 
+import addonHandler
 import config
 from . import dictHelper
 import gui
@@ -13,6 +14,20 @@ import speechDictHandler
 import os
 import wx
 
+# this addon mostly complements NVDA functionalities.
+# however, because the way NVDA works, when you use
+# addon translation infrastructure by calling addonHandler.initTranslation() you loose access to the
+# NVDA translated strings
+# It is all or nothing: if you call addonHandler.initTranslation() the _(str) function looks for translations only in the addon localization files.
+# if you don't, then the _(str) function looks for translations in the NVDA localization files, but not in the addon localization files
+# In this addon, we add new buttons to specific dialogs. Of course the translations for these elements are not available in nvda localization files.
+# In the other hand, we use the label of dictionaries (default and voice) menus to find them in the menu tree, in order to redirect their activation handlers to our custom dictionary dialogs.
+# These menu labels are translated if NVDA is running in languages other than english. So now we need to access the nvda localization files to determine the menu labels, but we also need to access addon translation files to translate custom dialogs
+# What we did is we saved the nvda translator to the __ variable while _ variable now is used to translate addon strings
+
+
+__ = _
+addonHandler.initTranslation()
 
 # we need to redirect some menus to trigger our specific dictionary dialog instead of NVDA one
 # This is needed because aparently wx stores the address of the methods bound to menus activation, so patching the class is not enough, we need to bind the menus again
@@ -29,7 +44,7 @@ def findMenuItem(menu, name):
 
 def getDictionariesMenu():
 	preferencesMenu = gui.mainFrame.sysTrayIcon.preferencesMenu
-	dictionaryMenu = findMenuItem(preferencesMenu, _("Speech &dictionaries"))
+	dictionaryMenu = findMenuItem(preferencesMenu, __("Speech &dictionaries"))
 	if not dictionaryMenu:
 		return None
 	return dictionaryMenu.GetSubMenu()
@@ -39,21 +54,21 @@ def getDefaultDictionaryMenu():
 	dictionariesMenu = getDictionariesMenu()
 	if not dictionariesMenu:
 		return None
-	return findMenuItem(dictionariesMenu, _("&Default dictionary..."))
+	return findMenuItem(dictionariesMenu, __("&Default dictionary..."))
 
 
 def getVoiceDictionaryMenu():
 	dictionariesMenu = getDictionariesMenu()
 	if not dictionariesMenu:
 		return None
-	return findMenuItem(dictionariesMenu, _("&Voice dictionary..."))
+	return findMenuItem(dictionariesMenu, __("&Voice dictionary..."))
 
 def rebindMenu(menu, handler):
 	gui.mainFrame.sysTrayIcon.Unbind(wx.EVT_MENU, menu)
 	gui.mainFrame.sysTrayIcon.Bind(wx.EVT_MENU, handler, menu)
 
 def showEnhancedDictionaryDialog(dic, title = None):
-	gui.mainFrame._popupSettingsDialog(EnhancedDictionaryDialog, title or _("Default dictionary"), dic)
+	gui.mainFrame._popupSettingsDialog(EnhancedDictionaryDialog, title or __("Default dictionary"), dic)
 
 # This is our new dictionary dialog.
 # it presents the following changes compared to the original dialog:
@@ -73,29 +88,29 @@ class EnhancedDictionaryDialog(gui.settingsDialogs.DictionaryDialog):
 	
 	def _makeTitle(self, title):
 		# Translators: The profile name for normal configuration
-		profileName = self._profile.name or _("normal configuration")
+		profileName = self._profile.name or __("normal configuration")
 		log.debug(f"will return {title} - {profileName}")
 		return f"{title} - {profileName}"
 	
 	def makeSettings(self, settingsSizer):
 		sHelper = guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
 		# Translators: The label for the list box of dictionary entries in speech dictionary dialog.
-		entriesLabelText=_("&Dictionary entries")
+		entriesLabelText = __("&Dictionary entries")
 		self.dictList = sHelper.addLabeledControl(
 			entriesLabelText,
 			wx.ListCtrl, style=wx.LC_REPORT | wx.LC_SINGLE_SEL
 		)
 		# Translators: The label for a column in dictionary entries list used to identify comments for the entry.
-		self.dictList.InsertColumn(0,_("Comment"),width=150)
+		self.dictList.InsertColumn(0, __("Comment"),width=150)
 		# Translators: The label for a column in dictionary entries list used to identify pattern (original word or a pattern).
-		self.dictList.InsertColumn(1,_("Pattern"),width=150)
+		self.dictList.InsertColumn(1, __("Pattern"),width=150)
 		# Translators: The label for a column in dictionary entries list and in a list of symbols from symbol pronunciation dialog used to identify replacement for a pattern or a symbol
-		self.dictList.InsertColumn(2,_("Replacement"),width=150)
+		self.dictList.InsertColumn(2, __("Replacement"),width=150)
 		# Translators: The label for a column in dictionary entries list used to identify whether the entry is case sensitive or not.
-		self.dictList.InsertColumn(3,_("case"),width=50)
+		self.dictList.InsertColumn(3, __("case"),width=50)
 		# Translators: The label for a column in dictionary entries list used to identify whether the entry is a regular expression, matches whole words, or matches anywhere.
-		self.dictList.InsertColumn(4,_("Type"),width=50)
-		self.offOn = (_("off"),_("on"))
+		self.dictList.InsertColumn(4, __("Type"),width=50)
+		self.offOn = (__("off"),__("on"))
 		for entry in self.tempSpeechDict:
 			self.dictList.Append((entry.comment,entry.pattern,entry.replacement,self.offOn[int(entry.caseSensitive)],EnhancedDictionaryDialog.TYPE_LABELS[entry.type]))
 		self.editingIndex=-1
@@ -104,19 +119,19 @@ class EnhancedDictionaryDialog(gui.settingsDialogs.DictionaryDialog):
 		bHelper.addButton(
 			parent=self,
 			# Translators: The label for a button in speech dictionaries dialog to add new entries.
-			label=_("&Add")
+			label=__("&Add")
 		).Bind(wx.EVT_BUTTON, self.OnAddClick)
 
 		bHelper.addButton(
 			parent=self,
 			# Translators: The label for a button in speech dictionaries dialog to edit existing entries.
-			label=_("&Edit")
+			label = __("&Edit")
 		).Bind(wx.EVT_BUTTON, self.OnEditClick)
 
 		bHelper.addButton(
 			parent=self,
 			# Translators: The label for a button in speech dictionaries dialog to remove existing entries.
-			label=_("&Remove")
+			label = __("&Remove")
 		).Bind(wx.EVT_BUTTON, self.OnRemoveClick)
 
 		# name of the default profile is always set to None on NVDA
@@ -124,7 +139,7 @@ class EnhancedDictionaryDialog(gui.settingsDialogs.DictionaryDialog):
 			bHelper.addButton(
 				parent=self,
 				# Translators: The label for the import entries from default profile dictionary
-				label=_("&import entries from default profile dictionary")
+				label = _("&import entries from default profile dictionary")
 			).Bind(wx.EVT_BUTTON, self.onImportEntriesClick)
 
 		sHelper.addItem(bHelper)
