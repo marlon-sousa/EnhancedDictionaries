@@ -1,45 +1,89 @@
 # EnhancedDictionaries
-Complemento que adiciona 
-Nvda ADDON for handling more advanced dictionaries processing
+Complemento do NVDA para lidar com processamento avançado de
+dicionários
 
 ## download
-Download the [Enhanced Dictionaries 1.0 addon](/releases/latest)
+Baixe o [Complemento Enhanced Dictionaries 1.0](/releases/latest)
 
-## Features
+## Recursos
 
-### Profile specific dictionaries
-The way NVDA applies conditional settings, such as document formatting and others, is through the use of profiles.
+### Dicionários específicos do perfil
+A maneira que o NVDA implementa configurações condicionais, como a
+formatação de documentos e outras é pelo uso de perfis.
 
-Profiles are groups of settings that can, together, be applied conditionally to the screen reader.
+Perfis são grupos de configurações que podem, em conjunto, ser aplicadas
+condicionalmente no leitor de tela.
 
-For example, you can create a profile for coding applications, in which punctuation level is set to all, indentation announcement is set to tones and speech rate is set to a slower level, so you can read code in a better way. You can, then, associate this profile with visual studio, eclipse, notepad plus plus and Visual Studio Code, so that when any of these applications become active these configurations will automatically apply.
+Por exemplo, você pode criar um perfil para programar, no qual o nível
+de pontuação é tudo, anúncio de indentação é bips e a velocidade da fala
+é mais lenta para que você leia código de uma maneira mais confortável.
+Você pode, então, associar este perfil com o Visual Studio, Eclipse, notepad plus plus
+e Visual Studio Code, a fim de que quando esses aplicativos forem executados as configurações
+que você definiu anteriormente sejam aplicadas.
 
-When you alt tab to other applications, or when you close one of these applications and land in desktop, for example, the default configuration takes place. It is then possible to easily jump from your coding application to a browser and, without pressing any keys, read without punctuations in the browser and have your specific configuration applied when you are back on your code environment.
+Quando você der alt tab para uma outra aplicação, ou quando você fechar
+uma dessas aplicações e ir para a área de trabalho, por exemplo, a
+configuração padrão tem efeito. É então possível facilmente alternar
+entre o seu aplicativo para programar e o navegador e, sem pressionar
+nenhuma outra tecla extra, ler sem pontuações no navegador e aplicar a
+sua configuração específica quando estiver de volta ao ambiente de código.
 
-NVDA dictionaries are powerful, offering great features such as regular expression substitution. However, there is currently no way to attach dictionaries to profiles on NVDA.
+Dicionários do NVDA são poderosos, oferecendo ótimas funções como
+substituição por expressão regular. No entanto, atualmente não existe
+nenhuma maneira de anexar dicionários aos perfis do NVDA.
 
-This means that if you set a substitution in the default dictionary, it will be applied in all cases, even in applications or situations where you might wish they are not.
+Isto significa que se você configurar uma substituição no dicionário padrão, ela será applicada em todos os casos, mesmo em programas ou
+situações específicas que você quisesse que elas não fossem.
 
-This addon implements profile context when processing and creating / editing dictionaries. 
+Este complemento implementa o processamento e criação / edição de dicionários no contexto do perfil.
 
-#### How it works?
+#### Como funciona?
 
-Simply install the addon. When it's active:
-* Dictionaries are now correctly handled taking in consideration the active profile.
-* If dictionaries (default or voice specific) exist for the current profile, they are used.
-* If they don't exist, the dictionaries for default profile are used. This is consistent to the way NVDA behaves, in the sense that when I create a new profile the configurations I don't change on this new profile are taken from the default one. Similarly, if I don't set a dictionary for a profile, the default dictionary is used.
-* Voice dictionaries behave the exact same way: if there is a voice specific dictionary for the active profile, it is used. Otherwise, the dictionary for that voice from the default profile (if it exists) is used.
-* The dictionary dialog, when opened, always shows on its title what profile that dictionary relates to.
-* The active profile will determine which dictionary is opened for editing when the default or voice dictionary menus are activated. This is consistent to the way NVDA behaves, because if one goes to settings and change a setting, this will be saved on the active profile. Similarly, the opened dictionary will belong to that profile.
-* If a given dictionary does not exist on an active profile and the dictionary dialog is opened, a new dictionary for that profile will be created. It will show no entries, as it is new. However, it won't be saved until the user closes that dialog clicking on "ok". If they do, the new dictionary will be effective. If they cancel the dialog, the default profile dictionary will still be used and no profile specific dictionary is saved.
-* When a new profile specific dictionary is created, it becomes effective and, thus, the patterns on the default dictionary are no longer active for that profile. This might be the desired behavior, but perhaps not. Perhaps the user wants to use all the patterns from the default dictionary plus new patterns only active on this profile.
-* To cover this possibility, a new button, called "import entries from default dictionary profile", is created in the dictionary dialog.
+Basta instalar o complemento. Quando ele está ativo:
 
-This button appears only when a profile specific dictionary is being edited. On activation, it behaves the following way:
-  - The entries from default dictionary (or voice specific dictionary) from the default profile are read.
-  - Entries that are not found on the dictionary being edited are added to it.
-  - If an entry from the default (or voice) dictionary is found on the dictionary being edited, it does not overwrite the current entry.
-  - The import does not save the new entries on disc. It just adds imported entries in the entries list in the dictionary dialog. Focus is placed on the list and the user then has the oportunity to review the new list of entries, as if they have typed by hand all of them.
-* Whenever the user creates a dictionary on a specific profile, it is effective immediately for that profile.
-* Whenever a profile changes, the specific dictionaries (default and voice) become active immediately. If these dictionaries do not exist, the default profile one's are used.
-* Builtin and temp dictionaries aren't affected, they are not dependent on profiles, the latter because it is temporary, the former because it is built in.
+* Dicionários são corretamente tratados tendo em vista o perfil atual.
+* Se dicionários específicos (padrão ou voz) existirem para o perfil
+atual, eles serão usados.
+* Se eles não existirem, os dicionários do perfil padrão serão usados.
+Isto é consistente com a forma que o NVDA se comporta, no sentido de que
+quando se cria um novo perfil, as configurações que não são mudadas no
+perfil novo são pegas do perfil padrão. Similarmente, se não for configurado um dicionário para o perfil atual,
+o dicionário do perfil padrão será usado.
+* Dicionários de voz funcionam exatamente dessa mesma forma: se existir
+um dicionário de voz para o perfil atual, ele será usado. Do
+contrário, o dicionário da voz do perfil padrão, se existir, será usado.
+* O título da janela para configurar o dicionário mostra em qual perfil
+o dicionário está sendo editado.
+* O perfil atualmente ativo determinará qual dicionário é
+editado quando os menus de dicionário padrão ou da voz forem ativados.
+Isto é consistente com a forma que o NVDA trabalha, uma vez que quando
+se muda uma configuração, ela é salva no perfil atual. Similarmente, o
+dicionário atualmente aberto irá pertencer a este perfil.
+* Se um dado dicionário não existir para o perfil atual e a janela para
+configurar o dicionário for aberta, um novo dicionário para este perfil será criado. Como ele é um dicionário novo, iniciará vazio.
+No entanto, o dicionário não será salvo até que o usuário feche o diálogo clicando em "ok". Quando ele fizer isto, o novo dicionário
+entrará em efeito. Se o diálogo for cancelado, o dicionário padrão
+continuará em efeito e o dicionário atualmente sendo modificado não será salvo.
+* Quando um novo dicionário específico para o perfil atual é criado,
+ele entra em efeito e, assim, as configurações feitas no dicionário padrão
+deixarão de ser aplicadas. Este pode ser o comportamento esperado, mas
+talvez não. Talvez você queira usar as configurações do dicionário
+padrão mais as configurações feitas no dicionário do perfil atual.
+* Para preencher esta lacuna, um botão "importar entradas do dicionário
+padrão" foi criado no diálogo de configurar o dicionário.
+Este botão aparece apenas quando um dicionário específico de perfil
+estiver sendo editado. Quando for ativado, ele funciona da seguinte
+maneira:
+
+    - As entradas do dicionário padrão (ou dicionário específico de voz) do perfil padrão são lidas.
+    - As entradas que não são encontradas no dicionário que está sendo editado são adicionadas a ele.
+    - Se uma entrada do dicionário padrão (ou de voz) for encontrada no dicionário que está sendo editado, ela não substituirá a entrada atual.
+    - A importação não salva as novas entradas no disco. Ela apenas adiciona entradas importadas na lista de entradas
+    no diálogo de configurar o dicionário. O foco é colocado na lista e o usuário tem a oportunidade de revisar a nova lista de entradas, como se tivesse digitado
+    manualmente todas elas.
+
+* Sempre que o usuário cria um dicionário em um perfil específico, ele
+entra em efeito imediatamente para esse perfil.
+* Sempre que um perfil muda, os dicionários específicos (padrão e voz) ficam ativos imediatamente. Se esses dicionários não existirem,
+os do perfil padrão são usados.
+* Os dicionários interno e temporário do NVDA não são afetados, já que eles não dependem de perfis, o último por ser temporário e o primeiro por ser interno.
