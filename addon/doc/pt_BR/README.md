@@ -54,7 +54,7 @@ um dicionário de voz para o perfil atual, ele será usado. Do
 contrário, o dicionário da voz do perfil padrão, se existir, será usado.
 * O título da janela para configurar o dicionário mostra em qual perfil
 o dicionário está sendo editado.
-* O dicionário atualmente ativo determinará qual dicionário é
+* O perfil atualmente ativo determinará qual dicionário é
 editado quando os menus de dicionário padrão ou da voz forem ativados.
 Isto é consistente com a forma que o NVDA trabalha, uma vez que quando
 se muda uma configuração, ela é salva no perfil atual. Similarmente, o
@@ -86,4 +86,4 @@ maneira:
 entra em efeito imediatamente para esse perfil.
 * Sempre que um perfil muda, os dicionários específicos (padrão e voz) ficam ativos imediatamente. Se esses dicionários não existirem,
 os do perfil padrão são usados.
-* Os dicionários embutido do NVDA e temporário não são afetados, eles não dependem de perfis, o último por ser temporário e o primeiro por ser embutido.
+* Os dicionários interno e temporário do NVDA não são afetados, já que eles não dependem de perfis, o último por ser temporário e o primeiro por ser interno.
