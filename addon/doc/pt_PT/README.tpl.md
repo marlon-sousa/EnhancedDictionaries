@@ -1,9 +1,9 @@
-# EnhancedDictionaries
+# EnhancedDictionaries ${addon_version}
 
 Extra para lidar com um processamento de dicionários mais avançado
 
 ## Descarregar
-Descarregar o [Enhanced Dictionaries 1.0 addon](/releases/latest)
+Descarregar o [extra Enhanced Dictionaries ${addon_version}](https://github.com/marlon-sousa/EnhancedDictionaries/releases/download/${addon_version}/EnhancedDictionaries-${addon_version}.nvda-addon)
 
 ## Recursos
 
@@ -67,7 +67,7 @@ Instale o extra e quando ele estiver activo, observará o seguinte:
 * Sempre que um perfil muda, os seus dicionários específicos (padrão e de voz) ficam activos imediatamente. Se esses dicionários não existirem, os do perfil padrão serão usados.
 * Os dicionários embutidos e temporários não são afectados, pois não dependem de perfis, o último por ser temporário e o primeiro por ser embutido.
 
-## Gerando o complemento
+## Gerando o extra
 
 Você vai precisar de:
 
@@ -77,13 +77,13 @@ Você vai precisar de:
 * markdown (pip install markdown)
 * comando msgfmt. A maneira mais simples de obtê-lo é instalar o git e, na instalação, escolher a opção para tornar as ferramentas do bash disponíveis para o prompt de comandos
 
-Uma vez que estes ítems estejam instalados, basta escrever scons na pasta raiz do projeto para gerar o complemento  
+Uma vez que estes ítems estejam instalados, basta escrever scons na pasta raiz do projeto para gerar o extra  
 
 ## Contribuindo traduções
 
-### Traduzindo o complemento
+### Traduzindo o extra
 
-Assumindo-se que você já tenha o ambiente configurado para construir o complemento (veja item acima), para gerar um arquivo pot de tradução basta escrever scons pot na pasta raiz do projeto.
+Assumindo-se que você já tenha o ambiente configurado para construir o extra (veja item acima), para gerar um arquivo pot de tradução basta escrever scons pot na pasta raiz do projeto.
 
 A partir daí, é possível contribuir os arquivos po de tradução para seu idioma.
 
@@ -98,7 +98,7 @@ Por isso, exceto pelo arquivo readme.md na raiz do projeto, você não encontrar
 Os arquivos .tpl.md são arquivos markdown normais, exceto por um recurso a mais: se você usar ${[var]} em qualquer lugar do texto, [var] será substituído por uma variável com o mesmo nome ddefinida em buildVars.py.
 Caso não haja uma variável com o mesmo nome, a substituição não acontece.
 
-Isso é útil, por exemplo, para fazer com que a documentação reflita limks ou número de versão do complemento automaticamente, sem que precise ser reescrita.
+Isso é útil, por exemplo, para fazer com que a documentação reflita limks ou número de versão do extra automaticamente, sem que precise ser reescrita.
 
 Para traduzir a documentação, traduza o arquivo readme.tpl.md na raiz do projeto. O arquivo traduzido deve ser colocado na pasta addon/locale/[lang] e deve se chamar readme.tpl.md.
 
