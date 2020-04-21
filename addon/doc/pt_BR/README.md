@@ -45,35 +45,37 @@ Basta instalar o complemento. Quando ele está ativo:
 * Se dicionários específicos (padrão ou voz) existirem para o perfil
 atual, eles serão usados.
 * Se eles não existirem, os dicionários do perfil padrão serão usados.
-Isto é consistente com a forma que o NVDA se comporta, no sentido de que
-quando se cria um novo perfil, as configurações que não são mudadas no
-perfil novo são pegas do perfil padrão. Similarmente, se não for configurado um dicionário para o perfil atual,
-o dicionário do perfil padrão será usado.
+
+    Isto é consistente com a forma que o NVDA se comporta, no sentido de que quando se cria um novo perfil, as configurações que não são mudadas noperfil novo são pegas do perfil padrão.
+
+    Similarmente, se não for configurado um dicionário para o perfil atual, o dicionário do perfil padrão será usado.
+
 * Dicionários de voz funcionam exatamente dessa mesma forma: se existir
 um dicionário de voz para o perfil atual, ele será usado. Do
 contrário, o dicionário da voz do perfil padrão, se existir, será usado.
-* O título da janela para configurar o dicionário mostra em qual perfil
-o dicionário está sendo editado.
-* O perfil atualmente ativo determinará qual dicionário é
-editado quando os menus de dicionário padrão ou da voz forem ativados.
-Isto é consistente com a forma que o NVDA trabalha, uma vez que quando
-se muda uma configuração, ela é salva no perfil atual. Similarmente, o
-dicionário atualmente aberto irá pertencer a este perfil.
-* Se um dado dicionário não existir para o perfil atual e a janela para
-configurar o dicionário for aberta, um novo dicionário para este perfil será criado. Como ele é um dicionário novo, iniciará vazio.
-No entanto, o dicionário não será salvo até que o usuário feche o diálogo clicando em "ok". Quando ele fizer isto, o novo dicionário
-entrará em efeito. Se o diálogo for cancelado, o dicionário padrão
-continuará em efeito e o dicionário atualmente sendo modificado não será salvo.
-* Quando um novo dicionário específico para o perfil atual é criado,
-ele entra em efeito e, assim, as configurações feitas no dicionário padrão
-deixarão de ser aplicadas. Este pode ser o comportamento esperado, mas
-talvez não. Talvez você queira usar as configurações do dicionário
-padrão mais as configurações feitas no dicionário do perfil atual.
-* Para preencher esta lacuna, um botão "importar entradas do dicionário
-padrão" foi criado no diálogo de configurar o dicionário.
-Este botão aparece apenas quando um dicionário específico de perfil
-estiver sendo editado. Quando for ativado, ele funciona da seguinte
-maneira:
+* O título da janela para configurar o dicionário mostra em qual perfil o dicionário está sendo editado.
+* O perfil atualmente ativo determinará qual dicionário é editado quando os menus de dicionário padrão ou da voz forem ativados.
+
+    Isto é consistente com a forma que o NVDA trabalha, uma vez que quando se muda uma configuração, ela é salva no perfil atual.
+
+    Similarmente, o dicionário atualmente aberto irá pertencer a este perfil.
+
+* Se um dado dicionário não existir para o perfil atual e a janela para configurar o dicionário for aberta, um novo dicionário para este perfil será criado. Como ele é um dicionário novo, iniciará vazio.
+
+    No entanto, o dicionário não será salvo até que o usuário feche o diálogo clicando em "ok". Quando ele fizer isto, o novo dicionário entrará em efeito.
+
+    Se o diálogo for cancelado, o dicionário padrão continuará em efeito e o dicionário atualmente sendo modificado não será salvo.
+
+* Quando um novo dicionário específico para o perfil atual é criado, ele entra em efeito e, assim, as configurações feitas no dicionário padrão
+deixarão de ser aplicadas.
+
+    Este pode ser o comportamento esperado, mas talvez não.
+
+    Talvez você queira usar as configurações do dicionário padrão mais as configurações feitas no dicionário do perfil atual.
+
+* Para preencher esta lacuna, um botão "importar entradas do dicionário padrão" foi criado no diálogo de configurar o dicionário.
+
+    Este botão aparece apenas quando um dicionário específico de perfil estiver sendo editado. Quando for ativado, ele funciona da seguinte maneira:
 
     - As entradas do dicionário padrão (ou dicionário específico de voz) do perfil padrão são lidas.
     - As entradas que não são encontradas no dicionário que está sendo editado são adicionadas a ele.
@@ -82,8 +84,46 @@ maneira:
     no diálogo de configurar o dicionário. O foco é colocado na lista e o usuário tem a oportunidade de revisar a nova lista de entradas, como se tivesse digitado
     manualmente todas elas.
 
-* Sempre que o usuário cria um dicionário em um perfil específico, ele
-entra em efeito imediatamente para esse perfil.
-* Sempre que um perfil muda, os dicionários específicos (padrão e voz) ficam ativos imediatamente. Se esses dicionários não existirem,
-os do perfil padrão são usados.
+* Sempre que o usuário cria um dicionário em um perfil específico, ele entra em efeito imediatamente para esse perfil.
+* Sempre que um perfil muda, os dicionários específicos (padrão e voz) ficam ativos imediatamente.
+
+    Se esses dicionários não existirem, os do perfil padrão são usados.
+
 * Os dicionários interno e temporário do NVDA não são afetados, já que eles não dependem de perfis, o último por ser temporário e o primeiro por ser interno.
+
+## Gerando o complemento
+
+Você vai precisar de:
+
+* python 3.6 ou superior
+* O pip deve estar configurado
+* scons (pip install scons)
+* markdown (pip install markdown)
+* comando msgfmt. A maneira mais simples de obtê-lo é instalar o git e, na instalação, escolher a opção para tornar as ferramentas do bash disponíveis para o prompt de comandos
+
+Uma vez que estes ítems estejam instalados, basta escrever scons na pasta raiz do projeto para gerar o complemento  
+
+## Contribuindo traduções
+
+### Traduzindo o complemento
+
+Assumindo-se que você já tenha o ambiente configurado para construir o complemento (veja item acima), para gerar um arquivo pot de tradução basta escrever scons pot na pasta raiz do projeto.
+
+A partir daí, é possível contribuir os arquivos po de tradução para seu idioma.
+
+Os idiomas atualmente já traduzidos podem ser encontrados na pasta addon/docs/locale.
+
+### Traduzindo documentação
+
+As documentações de tradução devem ser geradas a partir de arquivos .tpl.md (não de arquivos .md).
+
+Por isso, exceto pelo arquivo readme.md na raiz do projeto, você não encontrará outros arquivos .md versionados.
+
+Os arquivos .tpl.md são arquivos markdown normais, exceto por um recurso a mais: se você usar ${[var]} em qualquer lugar do texto, [var] será substituído por uma variável com o mesmo nome ddefinida em buildVars.py.
+Caso não haja uma variável com o mesmo nome, a substituição não acontece.
+
+Isso é útil, por exemplo, para fazer com que a documentação reflita limks ou número de versão do complemento automaticamente, sem que precise ser reescrita.
+
+Para traduzir a documentação, traduza o arquivo readme.tpl.md na raiz do projeto. O arquivo traduzido deve ser colocado na pasta addon/locale/[lang] e deve se chamar readme.tpl.md.
+
+As variáveis ${[var]} não devem ser alteradas. Escreva scons na raiz do projeto para que a documentação HTML e markdown seja gerada.
