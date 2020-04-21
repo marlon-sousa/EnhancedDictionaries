@@ -20,7 +20,7 @@ addon_info = {
 	"addon_description" : _("""This addon introduces better dictionaries handling for NVDA.
 It is now possible to use profile specific dictionaries, which eenables better productivity by allowing you to use different dictionaries for different applications and scenarius."""),
 	# version
-	"addon_version" : "1.0",
+	"addon_version" : "1.0.1",
 	# Author(s)
 	"addon_author" : u"Marlon Brandão de Sousa <marlon.bsousa@gmail.com>",
 	# URL for the add-on documentation support

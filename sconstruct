@@ -14,6 +14,8 @@ sys.dont_write_bytecode = True
 import buildVars
 
 def md2html(source, dest):
+	if ".tpl.md" in source:
+		return
 	import markdown
 	lang = os.path.basename(os.path.dirname(source)).replace('_', '-')
 	title="{addonSummary} {addonVersion}".format(addonSummary=buildVars.addon_info["addon_summary"], addonVersion=buildVars.addon_info["addon_version"])
@@ -94,13 +96,29 @@ env['BUILDERS']['NVDAAddon'] = Builder(generator=addonGenerator)
 env['BUILDERS']['NVDAManifest'] = Builder(generator=manifestGenerator)
 env['BUILDERS']['NVDATranslatedManifest'] = Builder(generator=translatedManifestGenerator)
 
+def expandFile(sourceFile):
+	if not ".tpl" in sourceFile:
+		return
+	with codecs.open(sourceFile, "r", "utf-8") as myfile:
+		content = myfile.read()
+	for k, v in buildVars.addon_info.items():
+		if v:
+			content = content.replace(f"${{{k}}}", v)
+	targetFile = sourceFile.replace(".tpl", "")
+	with codecs.open(targetFile, "w", "utf-8") as myfile:
+		myfile.write(content)
+
+
+
+
 def createAddonHelp(dir):
 	docsDir = os.path.join(dir, "doc")
 	if os.path.isfile("style.css"):
 		cssPath = os.path.join(docsDir, "style.css")
 		cssTarget = env.Command(cssPath, "style.css", Copy("$TARGET", "$SOURCE"))
 		env.Depends(addon, cssTarget)
-	if os.path.isfile("readme.md"):
+	if os.path.isfile("readme.tpl.md"):
+		expandFile("readme.tpl.md")
 		readmePath = os.path.join(docsDir, "en", "readme.md")
 		readmeTarget = env.Command(readmePath, "readme.md", Copy("$TARGET", "$SOURCE"))
 		env.Depends(addon, readmeTarget)
@@ -115,7 +133,7 @@ def createAddonBundleFromPath(path, dest):
 			for filename in filenames:
 				pathInBundle = os.path.join(relativePath, filename)
 				absPath = os.path.join(dir, filename)
-				if pathInBundle not in buildVars.excludedFiles: z.write(absPath, pathInBundle)
+				if pathInBundle not in buildVars.excludedFiles and not ".tpl.md" in pathInBundle: z.write(absPath, pathInBundle)
 	return dest
 
 def generateManifest(source, dest):
@@ -165,7 +183,15 @@ for file in pythonFiles:
 
 #Convert markdown files to html
 createAddonHelp("addon") # We need at least doc in English and should enable the Help button for the add-on in Add-ons Manager
+
+# if we have tpl.md files we need to compile them here
+for mdFile in env.Glob(os.path.join('addon', 'doc', '*', '*.tpl.md')):
+	expandFile(mdFile.path)
+
 for mdFile in env.Glob(os.path.join('addon', 'doc', '*', '*.md')):
+	# we don't process md templates
+	if mdFile.path.endswith(".tpl.md"):
+		continue
 	htmlFile = env.markdown(mdFile)
 	env.Depends(htmlFile, mdFile)
 	env.Depends(addon, htmlFile)
