@@ -24,21 +24,72 @@ This addon implements profile context when processing and creating / editing dic
 #### How it works?
 
 Simply install the addon. When it's active:
+
 * Dictionaries are now correctly handled taking in consideration the active profile.
 * If dictionaries (default or voice specific) exist for the current profile, they are used.
-* If they don't exist, the dictionaries for default profile are used. This is consistent to the way NVDA behaves, in the sense that when I create a new profile the configurations I don't change on this new profile are taken from the default one. Similarly, if I don't set a dictionary for a profile, the default dictionary is used.
+* If they don't exist, the dictionaries for default profile are used. This is consistent to the way NVDA behaves, in the sense that when I create a new profile the configurations I don't change on this new profile are taken from the default one.
+
+    Similarly, if I don't set a dictionary for a profile, the default dictionary is used.
+
 * Voice dictionaries behave the exact same way: if there is a voice specific dictionary for the active profile, it is used. Otherwise, the dictionary for that voice from the default profile (if it exists) is used.
 * The dictionary dialog, when opened, always shows on its title what profile that dictionary relates to.
-* The active profile will determine which dictionary is opened for editing when the default or voice dictionary menus are activated. This is consistent to the way NVDA behaves, because if one goes to settings and change a setting, this will be saved on the active profile. Similarly, the opened dictionary will belong to that profile.
-* If a given dictionary does not exist on an active profile and the dictionary dialog is opened, a new dictionary for that profile will be created. It will show no entries, as it is new. However, it won't be saved until the user closes that dialog clicking on "ok". If they do, the new dictionary will be effective. If they cancel the dialog, the default profile dictionary will still be used and no profile specific dictionary is saved.
-* When a new profile specific dictionary is created, it becomes effective and, thus, the patterns on the default dictionary are no longer active for that profile. This might be the desired behavior, but perhaps not. Perhaps the user wants to use all the patterns from the default dictionary plus new patterns only active on this profile.
+* The active profile will determine which dictionary is opened for editing when the default or voice dictionary menus are activated.
+
+    This is consistent to the way NVDA behaves, because if one goes to settings and change a setting, this will be saved on the active profile.
+
+    Similarly, the opened dictionary will belong to that profile.
+
+* If a given dictionary does not exist on an active profile and the dictionary dialog is opened, a new dictionary for that profile will be created.
+
+    It will show no entries, as it is new. However, it won't be saved until the user closes that dialog clicking on "ok".
+
+    If they do, the new dictionary will be effective. If they cancel the dialog, the default profile dictionary will still be used and no profile specific dictionary is saved.
+
+* When a new profile specific dictionary is created, it becomes effective and, thus, the patterns on the default dictionary are no longer active for that profile.
+
+    This might be the desired behavior, but perhaps not. Perhaps the user wants to use all the patterns from the default dictionary plus new patterns only active on this profile.
+
 * To cover this possibility, a new button, called "import entries from default dictionary profile", is created in the dictionary dialog.
 
-This button appears only when a profile specific dictionary is being edited. On activation, it behaves the following way:
-  - The entries from default dictionary (or voice specific dictionary) from the default profile are read.
-  - Entries that are not found on the dictionary being edited are added to it.
-  - If an entry from the default (or voice) dictionary is found on the dictionary being edited, it does not overwrite the current entry.
-  - The import does not save the new entries on disc. It just adds imported entries in the entries list in the dictionary dialog. Focus is placed on the list and the user then has the oportunity to review the new list of entries, as if they have typed by hand all of them.
-* Whenever the user creates a dictionary on a specific profile, it is effective immediately for that profile.
+    This button appears only when a profile specific dictionary is being edited. On activation, it behaves the following way:
+    
+    - The entries from default dictionary (or voice specific dictionary) from the default profile are read.
+    - Entries that are not found on the dictionary being edited are added to it.
+    - If an entry from the default (or voice) dictionary is found on the dictionary being edited, it does not overwrite the current entry.
+    - The import does not save the new entries on disc. It just adds imported entries in the entries list in the dictionary dialog. Focus is placed on the list and the user then has the oportunity to review the new list of entries, as if they have typed by hand all of them.
+
+*  Whenever the user creates a dictionary on a specific profile, it is effective immediately for that profile.
 * Whenever a profile changes, the specific dictionaries (default and voice) become active immediately. If these dictionaries do not exist, the default profile one's are used.
 * Builtin and temp dictionaries aren't affected, they are not dependent on profiles, the latter because it is temporary, the former because it is built in.
+
+## building the addon
+
+You will need:
+
+* python 3.6 or above.
+* pip must be configured
+* scons (pip install scons)
+* markdown (pip install markdown)
+* msgfmt utility. The easiest way of getting it is by installing git bash and choosing to include bash tools at command prompt
+
+Once you have everything installed, issuing scons at the root of the project should build the addon and generate docs.
+
+## contributting translations
+
+### translating the addon
+
+Assuming you have everything set up to build the addom (see previous topic) issuing scons pot should generate a pot file at the root project directory. It is them possible to generate and contribute the .po files for your language.
+Current languages can be found at /addon/locale directory
+
+### translating documentation
+
+Documentation translations are generated from .tpl.md (not from .md) files. This is why, except from this file (read.md) at the root of the project, you won't find other .md files.
+
+The .tpl.md files are normal markdown files with one addition: if you use ${var} within its text, the var will be replaced by a var with the same name defined in buildvars.py when the corresponding md and.html files are generated.
+
+If no variable with that name exists, the substitution doesn't take place.
+
+This is useful for example to generate links and titles with the addon version included without having to rewrite documentation.
+To translate documentation, grab the readme.tpl.md file at the root of the project and translate it. The translated file must be named readme.tpl.md and must be placed inside the addon/doc/[lang].
+
+The ${xxx} vars need to stay untouched. To generate the docs, issue scons and the markdown and HTML will be generated.
