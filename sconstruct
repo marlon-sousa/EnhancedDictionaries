@@ -122,9 +122,16 @@ def createAddonHelp(dir):
 		readmePath = os.path.join(docsDir, "en", "readme.md")
 		readmeTarget = env.Command(readmePath, "readme.md", Copy("$TARGET", "$SOURCE"))
 		env.Depends(addon, readmeTarget)
+	
+	if os.path.isfile("contributing.md"):
+		contribPath = os.path.join(docsDir, "en", "contributing.md")
+		contribTarget = env.Command(contribPath, "contributing.md", Copy("$TARGET", "$SOURCE"))
+		env.Depends(addon, contribTarget)
+
 
 def createAddonBundleFromPath(path, dest):
 	""" Creates a bundle from a directory that contains an addon manifest file."""
+	excludedFiles = expandGlobs(buildVars.excludedFiles, True)
 	basedir = os.path.abspath(path)
 	with zipfile.ZipFile(dest, 'w', zipfile.ZIP_DEFLATED) as z:
 		# FIXME: the include/exclude feature may or may not be useful. Also python files can be pre-compiled.
@@ -133,7 +140,7 @@ def createAddonBundleFromPath(path, dest):
 			for filename in filenames:
 				pathInBundle = os.path.join(relativePath, filename)
 				absPath = os.path.join(dir, filename)
-				if pathInBundle not in buildVars.excludedFiles and not ".tpl.md" in pathInBundle: z.write(absPath, pathInBundle)
+				if f"addon\\{pathInBundle}" not in excludedFiles and not ".tpl.md" in pathInBundle: z.write(absPath, pathInBundle)
 	return dest
 
 def generateManifest(source, dest):
@@ -161,8 +168,8 @@ def generateTranslatedManifest(source, language, out):
 	with codecs.open(out, "w", "utf-8") as f:
 		f.write(result)
 
-def expandGlobs(files):
-	return [f for pattern in files for f in env.Glob(pattern)]
+def expandGlobs(files, toString = False):
+	return [f for pattern in files for f in env.Glob(pattern, strings = toString)]
 
 addon = env.NVDAAddon(addonFile, env.Dir('addon'))
 
