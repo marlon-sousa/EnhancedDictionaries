@@ -1,8 +1,8 @@
-# EnhancedDictionaries 1.0.1
+# EnhancedDictionaries 1.0.2
 Nvda ADDON for handling more advanced dictionaries processing
 
 ## download
-Download the [Enhanced Dictionaries 1.0.1 addon](https://github.com/marlon-sousa/EnhancedDictionaries/releases/download/1.0.1/EnhancedDictionaries-1.0.1.nvda-addon)
+Download the [Enhanced Dictionaries 1.0.2 addon](https://github.com/marlon-sousa/EnhancedDictionaries/releases/download/1.0.2/EnhancedDictionaries-1.0.2.nvda-addon)
 
 ## Features
 
@@ -62,35 +62,6 @@ Simply install the addon. When it's active:
 * Whenever a profile changes, the specific dictionaries (default and voice) become active immediately. If these dictionaries do not exist, the default profile one's are used.
 * Builtin and temp dictionaries aren't affected, they are not dependent on profiles, the latter because it is temporary, the former because it is built in.
 
-## building the addon
+# Contributing and translating
 
-You will need:
-
-* python 3.6 or above.
-* pip must be configured
-* scons (pip install scons)
-* markdown (pip install markdown)
-* msgfmt utility. The easiest way of getting it is by installing git bash and choosing to include bash tools at command prompt
-
-Once you have everything installed, issuing scons at the root of the project should build the addon and generate docs.
-
-## contributting translations
-
-### translating the addon
-
-Assuming you have everything set up to build the addom (see previous topic) issuing scons pot should generate a pot file at the root project directory. It is them possible to generate and contribute the .po files for your language.
-Current languages can be found at /addon/locale directory
-
-### translating documentation
-
-Documentation translations are generated from .tpl.md (not from .md) files. This is why, except from this file (read.md) at the root of the project, you won't find other .md files.
-
-The .tpl.md files are normal markdown files with one addition: if you use ${[var]} within its text, [var] will be replaced by a var with the same name defined in buildvars.py when the corresponding md and.html files are generated.
-
-If no variable with that name exists, the substitution doesn't take place.
-
-This is useful for example to generate links and titles with the addon version included without having to rewrite documentation.
-
-To translate documentation, grab the readme.tpl.md file at the root of the project and translate it. The translated file must be named readme.tpl.md and must be placed inside the addon/doc/[lang] directory.
-
-The ${[xxx]} vars need to stay untouched. To generate the docs, issue scons and the markdown and HTML will be generated.
+If you want to contribute or translate this addon, please access the [project repository](https://github.com/marlon-sousa/EnhancedDictionaries) and find instructions on the contributing.md in the english documentation directory

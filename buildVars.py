@@ -20,7 +20,7 @@ addon_info = {
 	"addon_description" : _("""This addon introduces better dictionaries handling for NVDA.
 It is now possible to use profile specific dictionaries, which eenables better productivity by allowing you to use different dictionaries for different applications and scenarius."""),
 	# version
-	"addon_version" : "1.0.1",
+	"addon_version" : "1.0.2",
 	# Author(s)
 	"addon_author" : u"Marlon Brandão de Sousa <marlon.bsousa@gmail.com>",
 	# URL for the add-on documentation support
@@ -47,4 +47,4 @@ i18nSources = pythonSources + ["buildVars.py"]
 
 # Files that will be ignored when building the nvda-addon file
 # Paths are relative to the addon directory, not to the root directory of your addon sources.
-excludedFiles = []
+excludedFiles = [os.path.join("addon", "doc", "*", "contributing*.*")]
