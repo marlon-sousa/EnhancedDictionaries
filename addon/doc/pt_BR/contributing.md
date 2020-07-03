@@ -18,9 +18,9 @@ Uma vez que estes ítems estejam instalados, basta escrever scons na pasta raiz 
 
 Assumindo-se que você já tenha o ambiente configurado para construir o complemento (veja item acima), para gerar um arquivo pot de tradução basta escrever scons pot na pasta raiz do projeto.
 
-A partir daí, é possível contribuir os arquivos po de tradução para seu idioma.
+A partir daí, é possível contribuir com os arquivos po de tradução para seu idioma.
 
-Os idiomas atualmente já traduzidos podem ser encontrados na pasta addon/docs/locale.
+Os idiomas atualmente já traduzidos podem ser encontrados na pasta addon/locale.
 
 ### Traduzindo documentação
 
@@ -33,6 +33,6 @@ Caso não haja uma variável com o mesmo nome, a substituição não acontece.
 
 Isso é útil, por exemplo, para fazer com que a documentação reflita limks ou número de versão do complemento automaticamente, sem que precise ser reescrita.
 
-Para traduzir a documentação, traduza o arquivo readme.tpl.md na raiz do projeto. O arquivo traduzido deve ser colocado na pasta addon/locale/[lang] e deve se chamar readme.tpl.md.
+Para traduzir a documentação, traduza o arquivo readme.tpl.md na raiz do projeto. O arquivo traduzido deve ser colocado na pasta addon/doc/[lang] e deve se chamar readme.tpl.md.
 
 As variáveis ${[var]} não devem ser alteradas. Escreva scons na raiz do projeto para que a documentação HTML e markdown seja gerada.
