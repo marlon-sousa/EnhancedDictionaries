@@ -93,7 +93,7 @@ deixarão de ser aplicadas.
 
 # ajudando a traduzir ou desenvolver o complemento
 
-Se quiser ajudar a traduzir ou desenvolver o complemento, acesse o [repositório do projeto](https://github.com/marlon-sousa/EnhancedDictionaries) e busque pelo arquivo contrib.md no diretório de documentação equivalente ao seu idioma.
+Se quiser ajudar a traduzir ou desenvolver o complemento, acesse o [repositório do projeto](https://github.com/marlon-sousa/EnhancedDictionaries) e busque pelo arquivo contributing.md no diretório de documentação equivalente ao seu idioma.
 
 ## Colaboradores
 
