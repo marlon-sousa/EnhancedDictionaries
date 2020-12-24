@@ -1,8 +1,8 @@
-# EnhancedDictionaries 1.0.2
+# EnhancedDictionaries 1.1.0
 Nvda ADDON for handling more advanced dictionaries processing
 
 ## download
-Download the [Enhanced Dictionaries 1.0.2 addon](https://github.com/marlon-sousa/EnhancedDictionaries/releases/download/1.0.2/EnhancedDictionaries-1.0.2.nvda-addon)
+Download the [Enhanced Dictionaries 1.1.0 addon](https://github.com/marlon-sousa/EnhancedDictionaries/releases/download/1.1.0/EnhancedDictionaries-1.1.0.nvda-addon)
 
 ## Features
 
@@ -64,4 +64,13 @@ Simply install the addon. When it's active:
 
 # Contributing and translating
 
-If you want to contribute or translate this addon, please access the [project repository](https://github.com/marlon-sousa/EnhancedDictionaries) and find instructions on the contributing.md in the english documentation directory
+If you want to contribute or translate this addon, please access the [project repository](https://github.com/marlon-sousa/EnhancedDictionaries) and find instructions on the contributing.md in the english documentation directory.
+
+## Contributors
+
+Special thanks to
+
+*  Thiago Seus - Brazilian Portuguese translation
+* Ângelo Miguel Abrantes - Portuguese translation
+* Rémy Ruiz - French translation
+* Rémy Ruiz - Spanish translation

@@ -70,3 +70,12 @@ Instale o extra e quando ele estiver activo, observará o seguinte:
 # ajudando a traduzir ou desenvolver o extra
 
 Se quiser ajudar a traduzir ou desenvolver o extra, acesse o [repositório do projeto](https://github.com/marlon-sousa/EnhancedDictionaries) e busque pelo arquivo contrib.md no diretório de documentação equivalente ao seu idioma.
+
+## Colaboradores
+
+Agradecimentos a:
+
+*  Thiago Seus - Brazilian Portuguese translation
+* Ângelo Miguel Abrantes - Portuguese translation
+* Rémy Ruiz - French translation
+* Rémy Ruiz - Spanish translation

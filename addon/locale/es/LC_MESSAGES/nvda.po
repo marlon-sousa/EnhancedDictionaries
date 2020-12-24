@@ -1,0 +1,44 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the EnhancedDictionaries package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: EnhancedDictionaries 1.0\n"
+"Report-Msgid-Bugs-To: nvda-translations@groups.io\n"
+"POT-Creation-Date: 2020-04-18 19:44-0300\n"
+"PO-Revision-Date: 2020-12-20 16:56+0100\n"
+"Last-Translator: Rémy Ruiz <remyruiz@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#. Add-on summary, usually the user visible name of the addon.
+#. Translators: Summary for this add-on to be shown on installation and add-on information.
+#: addon\globalPlugins\EnhancedDictionaries\__init__.py:91 buildVars.py:17
+msgid "Enhanced dictionaries processing for NVDA"
+msgstr "Procesamiento de diccionarios más avanzado para NVDA"
+
+#. Translators: The label for the import entries from default profile dictionary
+#: addon\globalPlugins\EnhancedDictionaries\guiHelper.py:142
+msgid "&import entries from default profile dictionary"
+msgstr "&Importar entradas a partir del perfil de diccionario predeterminado"
+
+#. Add-on description
+#. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
+#: buildVars.py:20
+msgid ""
+"This addon introduces better dictionaries handling for NVDA.\n"
+"It is now possible to use profile specific dictionaries, which eenables better "
+"productivity by allowing you to use different dictionaries for different "
+"applications and scenarius."
+msgstr ""
+"Este complemento introduce mejoras en el procesamiento de diccionarios en "
+"NVDA.\n"
+"Ahora puedes usar diccionarios específicos para cada perfil, lo que te permite "
+"una mayor productividad al posibilitar que diversos diccionarios sean usados en "
+"diferentes aplicaciones o para diferentes propósitos."
