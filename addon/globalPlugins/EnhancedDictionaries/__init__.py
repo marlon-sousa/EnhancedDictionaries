@@ -35,7 +35,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def __init__(self, *args, **kwargs):
 		super(GlobalPlugin, self).__init__(*args, **kwargs)
-		log.debug("constructor")
 		self.injectProcessing()
 	
 	# the method below is responsible for modifying NVDA behavior.
@@ -52,7 +51,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		dictHelper.patchSpeechDict()
 		# redirect menus to show the enhanced dictionaries dialog
 		self.patchMenus()
-		log.debug(f"called function round rounded round for {config.conf.getActiveProfile().name}")
 
 	def patchMenus(self):
 		standardDictionaryMenu = guiHelper.getDefaultDictionaryMenu()
@@ -63,7 +61,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def onDefaultDictionaryCommand(self, evt):
 		# linting is complaining about from .settingsDialogs import * names
 		# too risky to change it all, so we will specify what we want on a method based aproach
-		log.debug("chamasticocact")
 		dic = dictHelper.getDictionary("default")
 		guiHelper.showEnhancedDictionaryDialog(dic)
 

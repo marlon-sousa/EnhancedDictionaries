@@ -34,7 +34,7 @@ addonHandler.initTranslation()
 # NVDA menus are created with id WX_ANY, so it is not possible to rely on menu ids when retrieving them
 # because of that, we had some options:
 # - getting menus based on their position, risky because if NVDA ever changes menu positioning the addon will break
-# - getting menus by their label. This is saffer, butharder, cinse menu labels are localized to the language nvda is using
+# - getting menus by their label. This is saffer, but harder, cinse menu labels are localized to the language nvda is using
 # what we did is we searched for the current string equivalent to the original menu label, using the exact same translation routin NVDA uses to translate it.
 
 def findMenuItem(menu, name):
@@ -83,13 +83,11 @@ class EnhancedDictionaryDialog(gui.settingsDialogs.DictionaryDialog):
 	def __init__(self, parent,title,speechDict):
 		self._profile = config.conf.getActiveProfile()
 		title = self._makeTitle(title)
-		log.debug(f"exibido {self._makeTitle(title)}")
 		super(EnhancedDictionaryDialog, self).__init__(parent,title,speechDict)
 	
 	def _makeTitle(self, title):
 		# Translators: The profile name for normal configuration
 		profileName = self._profile.name or __("normal configuration")
-		log.debug(f"will return {title} - {profileName}")
 		return f"{title} - {profileName}"
 	
 	def makeSettings(self, settingsSizer):
