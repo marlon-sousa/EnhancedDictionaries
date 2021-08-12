@@ -35,6 +35,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def __init__(self, *args, **kwargs):
 		super(GlobalPlugin, self).__init__(*args, **kwargs)
+		if globalVars.appArgs.secure:
+			log.info("EnhancedDictionaries addon will not activate on secure screens")
+			return
 		self.injectProcessing()
 	
 	# the method below is responsible for modifying NVDA behavior.
