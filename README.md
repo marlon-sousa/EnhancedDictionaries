@@ -1,8 +1,8 @@
-# EnhancedDictionaries 1.2.1
+# EnhancedDictionaries 1.3.0
 Nvda ADDON for handling more advanced dictionaries processing
 
 ## download
-Download the [Enhanced Dictionaries 1.2.1 addon](https://github.com/marlon-sousa/EnhancedDictionaries/releases/download/1.2.1/EnhancedDictionaries-1.2.1.nvda-addon)
+Download the [Enhanced Dictionaries 1.3.0 addon](https://github.com/marlon-sousa/EnhancedDictionaries/releases/download/1.3.0/EnhancedDictionaries-1.3.0.nvda-addon)
 
 ## Features
 

@@ -76,14 +76,15 @@ def showEnhancedDictionaryDialog(dic, title = None):
 # for dictionaries belonging to specific profiles, a button to import entries from the default profile dictionary is presented
 # if a dictionary is being created (it does not exist on disc) it is activated imediately after the dialog closes
 
-class EnhancedDictionaryDialog(gui.settingsDialogs.DictionaryDialog):
+class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 	
 	PATTERN_COL = 1
 	
 	def __init__(self, parent,title,speechDict):
 		self._profile = config.conf.getActiveProfile()
 		title = self._makeTitle(title)
-		super(EnhancedDictionaryDialog, self).__init__(parent,title,speechDict)
+		super().__init__(parent, title, speechDict)
+	
 	
 	def _makeTitle(self, title):
 		# Translators: The profile name for normal configuration
@@ -110,7 +111,13 @@ class EnhancedDictionaryDialog(gui.settingsDialogs.DictionaryDialog):
 		self.dictList.InsertColumn(4, __("Type"),width=50)
 		self.offOn = (__("off"),__("on"))
 		for entry in self.tempSpeechDict:
-			self.dictList.Append((entry.comment,entry.pattern,entry.replacement,self.offOn[int(entry.caseSensitive)],EnhancedDictionaryDialog.TYPE_LABELS[entry.type]))
+			self.dictList.Append((
+				entry.comment,
+				entry.pattern,
+				entry.replacement,
+				self.offOn[int(entry.caseSensitive)],
+				EnhancedDictionaryDialog.TYPE_LABELS[entry.type]
+			))
 		self.editingIndex=-1
 
 		bHelper = guiHelper.ButtonHelper(orientation=wx.HORIZONTAL)
@@ -118,19 +125,27 @@ class EnhancedDictionaryDialog(gui.settingsDialogs.DictionaryDialog):
 			parent=self,
 			# Translators: The label for a button in speech dictionaries dialog to add new entries.
 			label=__("&Add")
-		).Bind(wx.EVT_BUTTON, self.OnAddClick)
+		).Bind(wx.EVT_BUTTON, self.onAddClick)
 
 		bHelper.addButton(
 			parent=self,
 			# Translators: The label for a button in speech dictionaries dialog to edit existing entries.
 			label = __("&Edit")
-		).Bind(wx.EVT_BUTTON, self.OnEditClick)
+		).Bind(wx.EVT_BUTTON, self.onEditClick)
 
 		bHelper.addButton(
 			parent=self,
 			# Translators: The label for a button in speech dictionaries dialog to remove existing entries.
 			label = __("&Remove")
-		).Bind(wx.EVT_BUTTON, self.OnRemoveClick)
+		).Bind(wx.EVT_BUTTON, self.onRemoveClick)
+
+		bHelper.sizer.AddStretchSpacer()
+
+		bHelper.addButton(
+			parent=self,
+			# Translators: The label for a button on the Speech Dictionary dialog.
+			label=__("Remove all")
+		).Bind(wx.EVT_BUTTON, self.onRemoveAll)
 
 		# name of the default profile is always set to None on NVDA
 		if(self._profile.name):
