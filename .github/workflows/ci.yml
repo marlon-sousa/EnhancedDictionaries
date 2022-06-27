@@ -14,6 +14,8 @@ jobs:
       - name: Obtain tag message
         uses: ericcornelissen/git-tag-annotation-action@v2
         id: tag-data
+      - name: install system dependencies
+        run: sudo apt install gettext
       - name: Install python
         uses: actions/setup-python@v4
         with:
@@ -21,7 +23,7 @@ jobs:
           # In this addon context it is really not important, as packaging should not deppend on architecture versions
           # However, for future NVDA related actions we might have to switch to windows runners
           python-version: '3.7'
-      - name: install dependencies
+      - name: install python dependencies
         run: |
           pip install scons
           pip install markdown
