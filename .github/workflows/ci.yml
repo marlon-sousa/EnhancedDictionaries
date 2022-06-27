@@ -1,6 +1,8 @@
 name: EnhancedFindDialogCI
 on:
-  - push
+  push:
+    tags:
+      - "**"
 jobs:
   Release_addon:
     runs-on: "ubuntu-latest"
@@ -28,7 +30,17 @@ jobs:
           pip install scons
           pip install markdown
       - name: generate addon
-        run: scons
+        run: |
+          rm *.nvda-addon
+          scons
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: *.nvda-addon
+          body: "${{ steps.tag-data.outputs.git-tag-annotation }}
+          fail_on_unmatched_files: true
+          target_commitish: "ci/release-workflow"
+          generate_release_notes: false
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
