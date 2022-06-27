@@ -1,8 +1,9 @@
 name: EnhancedFindDialogCI
-on: [push]
+on:
+  - push
 jobs:
-  Release-addon:
-    runs-on: ubuntu-latest
+  Release_addon:
+    runs-on: "ubuntu-latest"
     steps:
       - name: Obtain tag message
         uses: ericcornelissen/git-tag-annotation-action@v2
@@ -13,7 +14,7 @@ jobs:
       # see https://github.com/actions/checkout/issues/290
       - name: make sure we have the correct tag information
         run: git fetch --tags --force
-      -name: Install python
+      - name: Install python
         uses: actions/setup-python@v4
         with:
           python-version: '3.7'
