@@ -5,15 +5,15 @@ jobs:
   Release_addon:
     runs-on: "ubuntu-latest"
     steps:
-      - name: Obtain tag message
-        uses: ericcornelissen/git-tag-annotation-action@v2
-        id: tag-data
       - name: Checkout code
         uses: actions/checkout@v3
       # The next step is used to fix a small issue here to obtain the current tag message, which will be used as the release body. For more details
       # see https://github.com/actions/checkout/issues/290
       - name: make sure we have the correct tag information
         run: git fetch --tags --force
+      - name: Obtain tag message
+        uses: ericcornelissen/git-tag-annotation-action@v2
+        id: tag-data
       - name: Install python
         uses: actions/setup-python@v4
         with:
