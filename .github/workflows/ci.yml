@@ -36,8 +36,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: *.nvda-addon
-          body: "${{ steps.tag-data.outputs.git-tag-annotation }}
+          files: '*.nvda-addon'
+          body: "${{ steps.tag-data.outputs.git-tag-annotation }}"
           fail_on_unmatched_files: true
           target_commitish: "ci/release-workflow"
           generate_release_notes: false
