@@ -24,8 +24,9 @@ jobs:
           else
             echo "::set-output name=changes_exist::true"
           fi
+      - run: "differences to master ${{ steps.differences-to-master.outputs.changes_exist }}"
       - name: abort if tag is not applied on top of master
-        if: "${{ steps.differences-to-master.outputs.changes_exist }} == 'true'"
+        if: "${{ steps.differences-to-master.outputs.changes_exist }} == 'false'"
         uses: actions/github-script@v3
         with:
             script: |
