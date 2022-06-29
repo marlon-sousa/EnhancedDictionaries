@@ -16,7 +16,7 @@ jobs:
       - name: Obtain tag message
         uses: ericcornelissen/git-tag-annotation-action@v2
         id: tag-data
-      - name: Make sure this tag is applied on top of master branch
+      - name: Check differences to master branch
         id: differences-to-master
         run: |
           if git diff origin/master --exit-code; then
