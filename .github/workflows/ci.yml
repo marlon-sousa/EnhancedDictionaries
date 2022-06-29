@@ -17,14 +17,15 @@ jobs:
         uses: ericcornelissen/git-tag-annotation-action@v2
         id: tag-data
       - name: Make sure this tag is applied on top of master branch
+        id: differences-to-master
         run: |
-          if git diff master --exit-code; then
-            echo "::set-env name=changes_exist::false"
+          if git diff origin/master --exit-code; then
+            echo "::set-output name=changes_exist::false"
           else
-            echo "::set-env name=changes_exist::true"
+            echo "::set-output name=changes_exist::true"
           fi
       - name: abort if tag is not applied on top of master
-        if: "env.changes_exist == 'true'"
+        if: "${{ steps.differences-to-master.outputs.changes_exist }} == 'true'"
         uses: actions/github-script@v3
         with:
             script: |
