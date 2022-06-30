@@ -70,7 +70,8 @@ Si vous voulez aider à traduire ou à développer l'extension, s'il vous plaît
 
 Remerciement spécial à
 
-*  Thiago Seus - Traduction Portugais Brésil
 * Ângelo Miguel Abrantes - Traduction Portugais Portugal
 * Rémy Ruiz - Traduction Français
 * Rémy Ruiz - Traduction Espagnol
+*  Thiago Seus - Traduction Portugais Brésil
+* Umut KORKMAZ - Traduction turc
