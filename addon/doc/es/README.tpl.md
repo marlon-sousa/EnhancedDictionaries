@@ -70,7 +70,8 @@ Si deseas ayudar a traducir o desarrollar el complemento, por favor  acceda al [
 
 Agradecimientos especiales a
 
-*  Thiago Seus - Traducción Portugués del Brasil
 * Ângelo Miguel Abrantes - Traducción Portugués
 * Rémy Ruiz - Traducción Francés
 * Rémy Ruiz - Traducción Español
+*  Thiago Seus - Traducción Portugués del Brasil
+* Umut KORKMAZ - Traducción turco

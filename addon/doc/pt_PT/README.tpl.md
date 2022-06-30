@@ -75,7 +75,8 @@ Se quiser ajudar a traduzir ou desenvolver o extra, acesse o [repositório do pr
 
 Agradecimentos a:
 
-*  Thiago Seus - Brazilian Portuguese translation
-* Ângelo Miguel Abrantes - Portuguese translation
-* Rémy Ruiz - French translation
-* Rémy Ruiz - Spanish translation
+* Ângelo Miguel Abrantes - Tradução para Português
+* Rémy Ruiz - Tradução para Espanhol
+* Rémy Ruiz - Tradução para Francês
+*  Thiago Seus - Tradução para Português do Brasil
+* Umut KORKMAZ - tradução para Turco
