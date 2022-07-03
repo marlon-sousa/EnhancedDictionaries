@@ -78,5 +78,6 @@ Agradecimentos a:
 * Ângelo Miguel Abrantes - Tradução para Português
 * Rémy Ruiz - Tradução para Espanhol
 * Rémy Ruiz - Tradução para Francês
+* Tarik Hadžirović - Tradução para Croata
 *  Thiago Seus - Tradução para Português do Brasil
 * Umut KORKMAZ - tradução para Turco

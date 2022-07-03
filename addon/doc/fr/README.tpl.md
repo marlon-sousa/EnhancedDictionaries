@@ -73,5 +73,6 @@ Remerciement spécial à
 * Ângelo Miguel Abrantes - Traduction Portugais Portugal
 * Rémy Ruiz - Traduction Français
 * Rémy Ruiz - Traduction Espagnol
+* Tarik Hadžirović - Traduction Croate
 *  Thiago Seus - Traduction Portugais Brésil
 * Umut KORKMAZ - Traduction turc
