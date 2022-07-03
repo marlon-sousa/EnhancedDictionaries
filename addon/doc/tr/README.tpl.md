@@ -71,6 +71,7 @@ Bu eklentiye katkıda bulunmak veya bu eklentiyi çevirmek istiyorsanız, lütfe
 Özellikle ..... 'ya teşekkür
 
 * Ângelo Miguel Abrantes - Portekizce çeviri
+* Tarik Hadžirović - Hırvatça çeviri
 * Rémy Ruiz - Fransızca çeviri
 * Rémy Ruiz - İspanyolca çeviri
 *  Thiago Seus - Brezilya Portekizcesi çeviri
