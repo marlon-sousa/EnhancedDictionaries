@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Ukrainian translation\n"
+"POT-Creation-Date: 2022-07-10 18:30+0300\n"
+"PO-Revision-Date: 2022-07-10 18:46+0300\n"
+"Last-Translator: \n"
+"Language-Team: Ivan Shtefuriak ip0877@gmail.com\n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 3.1.1\n"
+"X-Poedit-Basepath: ../../../..\n"
+"X-Poedit-Bookmarks: -1,0,-1,-1,-1,-1,-1,-1,-1,-1\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: addon/globalPlugins/EnhancedDictionaries/guiHelper.py:155
+msgid "&import entries from default profile dictionary"
+msgstr "&імпортувати записи зі словника стандартного профілю"
+
+#: buildVars.py:19
+msgid "Enhanced dictionaries processing for NVDA"
+msgstr "Розширена обробка словників для NVDA"
+
+#: buildVars.py:22
+msgid ""
+"This addon introduces better dictionaries handling for NVDA.\n"
+"It is now possible to use profile specific dictionaries, which eenables "
+"better productivity by allowing you to use different dictionaries for "
+"different applications and scenarius."
+msgstr ""
+"Цей додаток покращує роботу зі словниками для NVDA.\n"
+"Тепер можна використовувати словники для конкретного профілю, що "
+"підвищує продуктивність, дозволяючи використовувати різні словники для "
+"різних програм та сценаріїв."

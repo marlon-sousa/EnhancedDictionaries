@@ -76,3 +76,4 @@ Bu eklentiye katkıda bulunmak veya bu eklentiyi çevirmek istiyorsanız, lütfe
 * Rémy Ruiz - İspanyolca çeviri
 *  Thiago Seus - Brezilya Portekizcesi çeviri
 * Umut KORKMAZ - Türkçe çeviri
+* Ivan Shtefuriak - Ukraynaca çeviri

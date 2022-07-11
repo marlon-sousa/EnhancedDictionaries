@@ -81,3 +81,4 @@ Agradecimentos a:
 * Tarik Hadžirović - Tradução para Croata
 *  Thiago Seus - Tradução para Português do Brasil
 * Umut KORKMAZ - tradução para Turco
+* Ivan Shtefuriak - tradução para Ucraniana

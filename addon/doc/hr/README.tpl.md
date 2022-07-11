@@ -76,3 +76,4 @@ Posebna zahvala za
 * Thiago Seus - brazilski portugalski prijevod
 * Umut KORKMAZ - turski prijevod
 * Tarik Hadžirović - hrvatski prijevod
+* Ivan Shtefuriak - ukrajinski prijevod
