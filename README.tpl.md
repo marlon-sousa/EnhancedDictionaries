@@ -76,3 +76,4 @@ Special thanks to
 * Tarik Hadžirović - Croatian translation
 *  Thiago Seus - Brazilian Portuguese translation
 * Umut KORKMAZ - Turkish translation
+* Ivan Shtefuriak - Ukrainian translation
