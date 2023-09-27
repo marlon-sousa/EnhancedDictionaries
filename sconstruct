@@ -117,11 +117,14 @@ def createAddonHelp(dir):
 		cssPath = os.path.join(docsDir, "style.css")
 		cssTarget = env.Command(cssPath, "style.css", Copy("$TARGET", "$SOURCE"))
 		env.Depends(addon, cssTarget)
-	if os.path.isfile("readme.tpl.md"):
-		expandFile("readme.tpl.md")
-		readmePath = os.path.join(docsDir, "en", "readme.md")
-		readmeTarget = env.Command(readmePath, "readme.md", Copy("$TARGET", "$SOURCE"))
-		env.Depends(addon, readmeTarget)
+	# Fix case if README.md is in uppercase, in this case the pipeline failed to build the english documentation because it was running on a Linux system.
+	for filename in ("readme", "README"):
+		if os.path.isfile(f"{filename}.tpl.md"):
+			expandFile(f"{filename}.tpl.md")
+			readmePath = os.path.join(docsDir, "en", "readme.md")
+			readmeTarget = env.Command(readmePath, f"{filename}.md", Copy("$TARGET", "$SOURCE"))
+			env.Depends(addon, readmeTarget)
+			break
 	
 	if os.path.isfile("contributing.md"):
 		contribPath = os.path.join(docsDir, "en", "contributing.md")
