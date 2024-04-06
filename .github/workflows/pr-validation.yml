@@ -24,4 +24,4 @@ jobs:
           pip install pre-commit
       - name: validate-pr
         run: |
-          pre-commit rum -all-files
+          pre-commit run -all-files
