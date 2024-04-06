@@ -1,14 +1,15 @@
 # -*- coding: UTF-8 -*-
-#A part of the EnhancedDictionaries addon for NVDA
-#Copyright (C) 2020 Marlon Sousa
-#This file is covered by the GNU General Public License.
-#See the file COPYING.txt for more details.
+# A part of the EnhancedDictionaries addon for NVDA
+# Copyright (C) 2020 Marlon Sousa
+# This file is covered by the GNU General Public License.
+# See the file COPYING.txt for more details.
 
 import config
 from logHandler import log
 import speechDictHandler
 from speechDictHandler import dictFormatUpgrade, dictionaries
 import os
+
 
 # we need to inject these methods in speechDictHandler.SpeechDict class
 # they will be used to sync with other dictionaries and to create new dictionaries
@@ -32,8 +33,8 @@ def syncFrom(self, source):
 
 
 # the functions below would be inserted right in speechDictHandler module
-# as they are specific for this addon, we don't need to inject them. We will ratter use them right from this module
-
+# as they are specific for this addon, we don't need to inject them.
+# We will ratter use them right from this module
 def reloadDictionaries():
 	from synthDriverHandler import getSynth
 	synth = getSynth()
@@ -113,19 +114,20 @@ It handles case when the synthesizer doesn't support voice setting.
 def _getVoiceDictionaryFileName(synth):
 	try:
 		dictFormatUpgrade.doAnyUpgrades(synth)
-	except:
+	except Exception:
 		log.error("error trying to upgrade dictionaries", exc_info=True)
 		pass
 	if synth.isSupported("voice"):
 		voice = synth.availableVoices[synth.voice].displayName
 		baseName = dictFormatUpgrade.createVoiceDictFileName(synth.name, voice)
 	else:
-		baseName=r"{synth}.dic".format(synth=synth.name)
+		baseName = r"{synth}.dic".format(synth=synth.name)
 	return baseName
 
 
 def _hasDictionaryProfile(profileName, dictionaryName):
 	return os.path.exists(os.path.join(dictFormatUpgrade.speechDictsPath, profileName or "", dictionaryName))
+
 
 def getProfileVoiceDictsPath():
 	profile = config.conf.getActiveProfile()
@@ -142,4 +144,3 @@ def _loadProfileDictionary(target, profileName, dictionaryName):
 
 def _loadProfileVoiceDictionary(target, synthName, voiceName):
 	target.load(os.path.join(getProfileVoiceDictsPath(), synthName, voiceName))
-
