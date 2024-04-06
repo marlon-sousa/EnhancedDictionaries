@@ -1,0 +1,27 @@
+name: EnhancedFindDialogPrValidation
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  Validate_PR:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: install system dependencies
+        run: sudo apt install gettext
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          # it seems that x86 versions of python 3 are not available for linux install.
+          # In this addon context it is really not important, as packaging should not deppend on architecture versions
+          # However, for future NVDA related actions we might have to switch to windows runners
+          python-version: "3.11"
+      - name: install python dependencies
+        run: |
+          pip install scons
+          pip install markdown
+          pip install pre-commit
+      - name: validate-pr
+        run: |
+          pre-commit rum -all-files
