@@ -9,7 +9,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: install system dependencies
-        run: sudo apt install gettext
+        run: |
+          sudo apt update
+          sudo apt install -y gettext
       - name: Install python
         uses: actions/setup-python@v4
         with:
@@ -21,5 +23,7 @@ jobs:
         run: |
           pip install scons
           pip install markdown
+          pip install pre-commit
       - name: validate-pr
-        uses: dym-ok/pre-commit-action@v1
+        run: |
+          pre-commit run --all-files
