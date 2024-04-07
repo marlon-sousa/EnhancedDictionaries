@@ -116,13 +116,13 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 		)
 		# Translators: The label for a column in dictionary entries list used to identify comments for the entry.
 		self.dictList.InsertColumn(0, __("Comment"), width=150)
-		# Translators: The label for a column in dictionary entries list used to identify pattern (original word or a pattern).
+		# Translators: The label for a column in dictionary entries list used to identify pattern (original word or a pattern). # noqa: E501
 		self.dictList.InsertColumn(1, __("Pattern"), width=150)
-		# Translators: The label for a column in dictionary entries list and in a list of symbols from symbol pronunciation dialog used to identify replacement for a pattern or a symbol
+		# Translators: The label for a column in dictionary entries list and in a list of symbols from symbol pronunciation dialog used to identify replacement for a pattern or a symbol # noqa: E501
 		self.dictList.InsertColumn(2, __("Replacement"), width=150)
-		# Translators: The label for a column in dictionary entries list used to identify whether the entry is case sensitive or not.
+		# Translators: The label for a column in dictionary entries list used to identify whether the entry is case sensitive or not. # noqa: E501
 		self.dictList.InsertColumn(3, __("case"), width=50)
-		# Translators: The label for a column in dictionary entries list used to identify whether the entry is a regular expression, matches whole words, or matches anywhere.
+		# Translators: The label for a column in dictionary entries list used to identify whether the entry is a regular expression, matches whole words, or matches anywhere. # noqa: E501
 		self.dictList.InsertColumn(4, __("Type"), width=50)
 		self.offOn = (__("off"), __("on"))
 		for entry in self.tempSpeechDict:
