@@ -4,11 +4,30 @@
 
 You will need:
 
-* python 3.6 or above.
+* python 3.11 or above.
 * pip must be configured
 * scons (pip install scons)
 * markdown (pip install markdown)
+* pre-commit (pip install pre-commit)
 * msgfmt utility. The easiest way of getting it is by installing git bash and choosing to include bash tools at command prompt
+
+At the very first time you clone the repository, perform a 
+```
+pre-commit install
+```
+
+to make sure pre-commit hooks are installed.
+
+If there are quality failures, commits won't be allowed.
+
+You can perform a pre test before commiting at any time by issuing
+
+```
+pre-commit run --all-files
+```
+
+Warning: if you do not install githooks (e.e issuing pre-commit install), your commits won't be cjhecked.  
+However, when submiting a pull request, there are checks that will block your commits if they fail passing pre-commit hooks. It is always best to fix quality issues before commiting.
 
 Once you have everything installed, issuing scons at the root of the project should build the addon and generate docs.
 

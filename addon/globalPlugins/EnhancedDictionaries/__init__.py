@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
-#A part of the EnhancedDictionaries addon for NVDA
-#Copyright (C) 2020 Marlon Sousa
-#This file is covered by the GNU General Public License.
-#See the file COPYING.txt for more details.
+# A part of the EnhancedDictionaries addon for NVDA
+# Copyright (C) 2020 Marlon Sousa
+# This file is covered by the GNU General Public License.
+# See the file COPYING.txt for more details.
 
 import addonHandler
 import config
@@ -25,6 +25,7 @@ def getActiveProfile(self):
 	log.debug(f"will return {self.profiles[-1].name}")
 	return self.profiles[-1]
 
+
 # for detailed explanations, see guiHelper.py file
 __ = _
 
@@ -39,12 +40,13 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 			log.info("EnhancedDictionaries addon will not activate on secure screens")
 			return
 		self.injectProcessing()
-	
+
 	# the method below is responsible for modifying NVDA behavior.
 	# we need that certain parts of NVDA behave differently than the original to insert our functionality
 	# for example, dictionaries menus need to activate our enhanced dictionary dialog and
 	# the classes handling the dictionary rules also need to be nodified to make more than they do.
-	# we also need to register ourselves to be notified whenever the active profile changes, so we can load the specific dictionaries.
+	# we also need to register ourselves to be notified whenever the active profile changes,
+	# so we can load the specific dictionaries.
 	def injectProcessing(self):
 		# add utility method to ConfigManager class to allow us to get the active profile in a giher level
 		config.ConfigManager.getActiveProfile = getActiveProfile
@@ -67,7 +69,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		dic = dictHelper.getDictionary("default")
 		guiHelper.showEnhancedDictionaryDialog(dic)
 
-	def onVoiceDictionaryCommand(self,evt):
+	def onVoiceDictionaryCommand(self, evt):
 		from synthDriverHandler import getSynth
 		synth = getSynth()
 		if synth.isSupported("voice"):

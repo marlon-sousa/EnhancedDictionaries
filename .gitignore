@@ -5,6 +5,7 @@ addon/doc/**/*.md
 *_docHandler.py
 *.html
 *.ini
+!flake8.ini
 *.mo
 *.pot
 *.py[co]
