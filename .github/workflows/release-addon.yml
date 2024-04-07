@@ -31,7 +31,9 @@ jobs:
           script: |
             core.setFailed('Releases can be generated only from commit on head of master branch')
       - name: install system dependencies
-        run: sudo apt install gettext
+        run: |
+          sudo apt update
+          sudo apt install -y gettext
       - name: Install python
         uses: actions/setup-python@v4
         with:
@@ -43,11 +45,15 @@ jobs:
         run: |
           pip install scons
           pip install markdown
-      - name: generate addon
+          pip install pre-commit
+      - name: validate addon
+        run: |
+          pre-commit run --all-files
+      - name: build addon
         run: |
           rm -f *.nvda-addon || true
           scons
-      - name: Release
+      - name: Release addon
         uses: softprops/action-gh-release@v1
         with:
           files: "*.nvda-addon"

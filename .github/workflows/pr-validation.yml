@@ -24,6 +24,6 @@ jobs:
           pip install scons
           pip install markdown
           pip install pre-commit
-      - name: validate-pr
+      - name: validate pr
         run: |
           pre-commit run --all-files
