@@ -1,33 +1,57 @@
 # Contributing
 
+
 ## building the addon
+
+
+### Local environment
+
+Although not mandatory, we suggest you perform the following:
+
+1. Clone NVDA in a folder at the same level as this project.  
+For example, if this project is cloned at c:\projects\EnhancedDictionaries, NVDA should be cloned at c:\projects\nvda.  
+Perform a clone with the --recursive flag. If NVDA is already cloned, make sure it is up to date, fetching and then synchronizing the master branch with the NVDA upstream master branch.  
+Perform a git submodule update --init command to make sure git submodules are correctly synchronized.
+2. Perform a git checkout in the release-2024.1 tag in the NVDA project. You don't need to build NVDA, just having the source code at the release branch is enough.
+3. Install visual studio code, if it is not installed. Although you can use other environments, the optimal setup requires visual studio code.
+4. Open the EnhancedDictionaries folder in VS Code. From command line, perform the "code ." command, or use the file / open folder menus on visual studio code itself and select the folder where this project is cloned.
+5. Use ctrl + shift + x to access the extensions widget in Visual studio code. Tab umtil the recomended section and install the recomended extensions.
+6. Restart visual studio code.
+7. Now, whenever you are navigating through code, pressing f12 in a NVDA object should take you to its source in NVDA project.
+
+### Dependencies
 
 You will need:
 
-* python 3.11 or above.
+* python 3.11.
 * pip must be configured
 * scons (pip install scons)
 * markdown (pip install markdown)
-* pre-commit (pip install pre-commit)
 * msgfmt utility. The easiest way of getting it is by installing git bash and choosing to include bash tools at command prompt
 
-At the very first time you clone the repository, perform a 
-```
-pre-commit install
-```
 
-to make sure pre-commit hooks are installed.
+#### Pre-commit
 
-If there are quality failures, commits won't be allowed.
+It is strongly recomended that you install pre-commit.
 
-You can perform a pre test before commiting at any time by issuing
+* pip imstall pre-commit
+* pre-commit install
 
-```
-pre-commit run --all-files
-```
+This will imstall pre-commit and configure its hooks, so that whenever you perform a commit several checks will apply.  
+Should any of them fail, the commit will not be allowed.
+This helps to ensure your commits have quality. You can bypass the check, however be aware that a pull request check will also apply these same checks and merge will be disabled should any of them fail, even if someone approves the pull request.
 
-Warning: if you do not install githooks (e.e issuing pre-commit install), your commits won't be cjhecked.  
-However, when submiting a pull request, there are checks that will block your commits if they fail passing pre-commit hooks. It is always best to fix quality issues before commiting.
+You can trigger the pre-commit checks at any time without performing a commit by issuing "pre-commit run --all-files".
+
+#### Flake8
+
+One of the pre-commit hooks is flake8, a python linter which, ammong other things, help to make sure the project has a consistent formating and that good practices are in place.
+
+Visual Studio code recomended extensions include flake8, so that you can be warned while editing code when something needs to be fixed.
+
+The visual studio code extension and the pre-commit flake8 hooks use the same configuration.
+
+### building
 
 Once you have everything installed, issuing scons at the root of the project should build the addon and generate docs.
 
