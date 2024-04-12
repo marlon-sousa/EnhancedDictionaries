@@ -83,7 +83,7 @@ def rebindMenu(menu, handler):
 
 
 def showEnhancedDictionaryDialog(dic, title=None):
-	gui.mainFrame._popupSettingsDialog(EnhancedDictionaryDialog, title or __("Default dictionary"), dic)
+	gui.mainFrame.popupSettingsDialog(EnhancedDictionaryDialog, title or __("Default dictionary"), dic)
 
 
 # This is our new dictionary dialog.

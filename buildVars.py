@@ -22,7 +22,7 @@ addon_info = {
     "addon_description": _("""This addon introduces better dictionaries handling for NVDA.
 It is now possible to use profile specific dictionaries, which eenables better productivity by allowing you to use different dictionaries for different applications and scenarius."""),
     # version
-    "addon_version": "1.4.1",
+    "addon_version": "1.5.0",
     # Author(s)
     "addon_author": u"Marlon Brandão de Sousa <marlon.bsousa@gmail.com>",
     # URL for the add-on documentation support
@@ -30,9 +30,9 @@ It is now possible to use profile specific dictionaries, which eenables better p
     # Documentation file name
     "addon_docFileName": "readme.html",
     # Minimum NVDA version supported (e.g. "2018.3.0", minor version is optional)
-    "addon_minimumNVDAVersion": "2022.1",
+    "addon_minimumNVDAVersion": "2024.1",
     # Last NVDA version supported/tested (e.g. "2018.4.0", ideally more recent than minimum version)
-    "addon_lastTestedNVDAVersion": "2023.1",
+    "addon_lastTestedNVDAVersion": "2024.1",
     # Add-on update channel (default is None, denoting stable releases, and for development releases, use "dev"; do not change unless you know what you are doing)
     "addon_updateChannel": None,
 }

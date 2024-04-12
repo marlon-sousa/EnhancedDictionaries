@@ -5,6 +5,7 @@
 # See the file COPYING.txt for more details.
 
 import config
+from NVDAState import WritePaths
 from logHandler import log
 import speechDictHandler
 from speechDictHandler import dictFormatUpgrade, dictionaries
@@ -81,7 +82,7 @@ def getDictionary(type):
 	# We will create it now and pass the new, empty dictionary to the caller, but won't save it.
 	# This is a task the caller should do when and if they wish
 	dic = speechDictHandler.SpeechDict()
-	dic.create(os.path.join(dictFormatUpgrade.speechDictsPath, profile.name, f"{type}.dic"))
+	dic.create(os.path.join(WritePaths.speechDictsDir, profile.name, f"{type}.dic"))
 	log.debug(
 		f"{type} dictionary was requested for profile {profile.name}, but the backing file does not exist."
 		f" A New dictionary was created, set to be backed by {dic.fileName} if it is ever saved."
@@ -94,7 +95,7 @@ def loadProfileDict():
 	if _hasDictionaryProfile(profile.name, "default.dic"):
 		_loadProfileDictionary(dictionaries["default"], profile.name, "default.dic")
 	else:
-		dictionaries["default"].load(os.path.join(dictFormatUpgrade.speechDictsPath, "default.dic"))
+		dictionaries["default"].load(os.path.join(WritePaths.speechDictsDir, "default.dic"))
 	dictionaries["builtin"].load("builtin.dic")
 
 
@@ -107,7 +108,7 @@ It handles case when the synthesizer doesn't support voice setting.
 	if(_hasVoiceDictionaryProfile(profile.name, synth.name, dictionaryFileName)):
 		_loadProfileVoiceDictionary(dictionaries["voice"], synth.name, dictionaryFileName)
 	else:
-		fileName = os.path.join(dictFormatUpgrade.voiceDictsPath, synth.name, dictionaryFileName)
+		fileName = os.path.join(WritePaths.voiceDictsDir, synth.name, dictionaryFileName)
 		dictionaries["voice"].load(fileName)
 
 
@@ -126,12 +127,12 @@ def _getVoiceDictionaryFileName(synth):
 
 
 def _hasDictionaryProfile(profileName, dictionaryName):
-	return os.path.exists(os.path.join(dictFormatUpgrade.speechDictsPath, profileName or "", dictionaryName))
+	return os.path.exists(os.path.join(WritePaths.speechDictsDir, profileName or "", dictionaryName))
 
 
 def getProfileVoiceDictsPath():
 	profile = config.conf.getActiveProfile()
-	return os.path.join(dictFormatUpgrade.speechDictsPath, profile.name or "", r"voiceDicts.v1")
+	return os.path.join(WritePaths.speechDictsDir, profile.name or "", r"voiceDicts.v1")
 
 
 def _hasVoiceDictionaryProfile(profileName, synthName, voiceName):
@@ -139,7 +140,7 @@ def _hasVoiceDictionaryProfile(profileName, synthName, voiceName):
 
 
 def _loadProfileDictionary(target, profileName, dictionaryName):
-	target.load(os.path.join(dictFormatUpgrade.speechDictsPath, profileName or "", dictionaryName))
+	target.load(os.path.join(WritePaths.speechDictsDir, profileName or "", dictionaryName))
 
 
 def _loadProfileVoiceDictionary(target, synthName, voiceName):
