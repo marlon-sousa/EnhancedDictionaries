@@ -86,6 +86,12 @@ def showEnhancedDictionaryDialog(dic, title=None):
 	gui.mainFrame.popupSettingsDialog(EnhancedDictionaryDialog, title or __("Default dictionary"), dic)
 
 
+def strToBool(string):
+	if string == "True":
+		return True
+	return False
+
+
 # This is our new dictionary dialog.
 # it presents the following changes compared to the original dialog:
 # - the title of the dialog contains the profile this dictionary belongs to
@@ -95,6 +101,7 @@ def showEnhancedDictionaryDialog(dic, title=None):
 # after the dialog closes
 class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 	PATTERN_COL = 1
+	keepUpdatedCheckBox = False
 
 	def __init__(self, parent, title, speechDict):
 		self._profile = config.conf.getActiveProfile()
@@ -103,7 +110,7 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 
 	def _makeTitle(self, title):
 		# Translators: The profile name for normal configuration
-		profileName = self._profile.name or __("normal configuration")
+		profileName = self._profile.name or "normal configuration"
 		return f"{title} - {profileName}"
 
 	def makeSettings(self, settingsSizer):
@@ -169,8 +176,20 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 				# Translators: The label for the import entries from default profile dictionary
 				label=_("&import entries from default profile dictionary")
 			).Bind(wx.EVT_BUTTON, self.onImportEntriesClick)
-
 		sHelper.addItem(bHelper)
+		self.keepUpdatedCheckBox = wx.CheckBox(
+			self, label=_("Keep the default and current voice dictionary entries updated in this profile dictionary.")
+		)
+		module = 'EnhancedDictionaries'
+		key = 'keepUpdatedCheckbox'
+		if module not in config.conf or key not in config.conf[module]:
+			config.conf[module] = {}
+			config.conf[module][key] = False
+			config.conf.save()
+		profileConfig = config.conf[module][key]
+		log.info('the config cauhth was' + str(profileConfig))
+		self.keepUpdatedCheckBox.SetValue(strToBool(profileConfig))
+		sHelper.addItem(self.keepUpdatedCheckBox)
 
 	def hasEntry(self, pattern):
 		for row in range(self.dictList.GetItemCount()):
@@ -181,11 +200,18 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 	def onOk(self, evt):
 		newDictionary = not os.path.exists(self.speechDict.fileName)
 		super().onOk(evt)
+
+		module = 'EnhancedDictionaries'
+		key = 'keepUpdatedCheckbox'
+		config.conf[module][key] = self.keepUpdatedCheckBox.GetValue()
+		config.conf.save()
+		log.info('saved value from checkbox on config. It is ' + str(self.keepUpdatedCheckBox.GetValue()))
+
 		if newDictionary:
 			# if we are saving a dictionary that didn't exist before (user just performed the first edition)
 			# we have to activate it now, otherwise it will be effective only on next profile switch.
 			log.debug(f"Activating new dictionary {self.speechDict.fileName}")
-			dictHelper.reloadDictionaries()
+		dictHelper.reloadDictionaries()
 
 	def onImportEntriesClick(self, evt):
 		sourceFileName = self.speechDict.fileName.replace(f"{self._profile.name}\\", "")

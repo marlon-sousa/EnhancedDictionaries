@@ -20,6 +20,12 @@ def patchSpeechDict():
 	speechDictHandler.SpeechDict.syncFrom = syncFrom
 
 
+def stringToBool(string):
+	if string == 'True':
+		return True
+	return False
+
+
 def create(self, fileName):
 	if os.path.exists(fileName):
 		raise f"can not create dictionary backed by file {fileName}"
@@ -39,9 +45,29 @@ def syncFrom(self, source):
 def reloadDictionaries():
 	from synthDriverHandler import getSynth
 	synth = getSynth()
+	module = 'EnhancedDictionaries'
+	key = 'keepUpdatedCheckbox'
+	profileConfig = config.conf[module][key]
+
 	loadProfileDict()
 	loadVoiceDict(synth)
-	log.debug(f"loaded dictionaries for profile {config.conf.getActiveProfile().name or 'default'}")
+	profileName = config.conf.getActiveProfile().name
+
+	if stringToBool(profileConfig):
+		sourceFileName = os.path.join(WritePaths.speechDictsDir, "default.dic")
+		source = speechDictHandler.SpeechDict()
+		source.load(sourceFileName)
+
+		activeDict = getDictionary("default")
+		activeDict.syncFrom(source)
+
+		voiceDict = getDictionary("voice")
+		voiceDict.syncFrom(source)
+
+		log.debug(f"Saving and activating updated dictionaries for profile {profileName}")
+		for dictType in ["default", "voice"]:
+			dictionaries[dictType].save()
+	log.debug(f"loaded dictionaries for profile {profileName or 'default'}")
 
 
 def _getVoiceDictionary(profile):
