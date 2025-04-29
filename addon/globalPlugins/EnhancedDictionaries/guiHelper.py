@@ -7,9 +7,10 @@
 import addonHandler
 import config
 from . import dictHelper
+from logHandler import log
+from . import profileConfigurationHelper
 import gui
 from gui import guiHelper
-from logHandler import log
 import speechDictHandler
 import os
 import wx
@@ -84,12 +85,6 @@ def rebindMenu(menu, handler):
 
 def showEnhancedDictionaryDialog(dic, title=None):
 	gui.mainFrame.popupSettingsDialog(EnhancedDictionaryDialog, title or __("Default dictionary"), dic)
-
-
-def strToBool(string):
-	if string == "True":
-		return True
-	return False
 
 
 # This is our new dictionary dialog.
@@ -176,19 +171,15 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 				# Translators: The label for the import entries from default profile dictionary
 				label=_("&import entries from default profile dictionary")
 			).Bind(wx.EVT_BUTTON, self.onImportEntriesClick)
+
 		sHelper.addItem(bHelper)
+
 		self.keepUpdatedCheckBox = wx.CheckBox(
 			self, label=_("Keep the default and current voice dictionary entries updated in this profile dictionary.")
 		)
-		module = 'EnhancedDictionaries'
-		key = 'keepUpdatedCheckbox'
-		if module not in config.conf or key not in config.conf[module]:
-			config.conf[module] = {}
-			config.conf[module][key] = False
-			config.conf.save()
-		profileConfig = config.conf[module][key]
-		log.info('the config cauhth was' + str(profileConfig))
-		self.keepUpdatedCheckBox.SetValue(strToBool(profileConfig))
+		savedCheckboxValue = profileConfigurationHelper.getSavedCheckboxValueForProfile()
+		self.keepUpdatedCheckBox.SetValue(savedCheckboxValue)
+		log.info("o valor da checkbox capturado é " + str(savedCheckboxValue))
 		sHelper.addItem(self.keepUpdatedCheckBox)
 
 	def hasEntry(self, pattern):
@@ -201,11 +192,9 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 		newDictionary = not os.path.exists(self.speechDict.fileName)
 		super().onOk(evt)
 
-		module = 'EnhancedDictionaries'
-		key = 'keepUpdatedCheckbox'
-		config.conf[module][key] = self.keepUpdatedCheckBox.GetValue()
-		config.conf.save()
-		log.info('saved value from checkbox on config. It is ' + str(self.keepUpdatedCheckBox.GetValue()))
+		checkboxValue = self.keepUpdatedCheckBox.GetValue()
+		profileConfigurationHelper.saveCheckboxValueForProfile(checkboxValue)
+		log.info("salvo valor da checkbox:" + str(checkboxValue))
 
 		if newDictionary:
 			# if we are saving a dictionary that didn't exist before (user just performed the first edition)
