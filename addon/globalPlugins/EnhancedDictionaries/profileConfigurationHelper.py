@@ -4,8 +4,9 @@ from logHandler import log
 module = 'EnhancedDictionaries'
 key = "keepUpdatedCheckbox"
 
+
 def stringToBool(value):
-    if value== "True":
+    if value == "True":
         return True
     return False
 

@@ -172,15 +172,17 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 				label=_("&import entries from default profile dictionary")
 			).Bind(wx.EVT_BUTTON, self.onImportEntriesClick)
 
-		sHelper.addItem(bHelper)
+			sHelper.addItem(bHelper)
 
-		self.keepUpdatedCheckBox = wx.CheckBox(
-			self, label=_("Keep the default and current voice dictionary entries updated in this profile dictionary.")
-		)
-		savedCheckboxValue = profileConfigurationHelper.getSavedCheckboxValueForProfile()
-		self.keepUpdatedCheckBox.SetValue(savedCheckboxValue)
-		log.info("o valor da checkbox capturado é " + str(savedCheckboxValue))
-		sHelper.addItem(self.keepUpdatedCheckBox)
+			profile = config.conf.getActiveProfile()
+			if profile.name != "normal configuration":
+				self.keepUpdatedCheckBox = wx.CheckBox(
+					self, label=_("$Sync entries with default profile dictionary.")
+				)
+				savedCheckboxValue = profileConfigurationHelper.getSavedCheckboxValueForProfile()
+				self.keepUpdatedCheckBox.SetValue(savedCheckboxValue)
+				log.info("o valor da checkbox capturado é " + str(savedCheckboxValue))
+				sHelper.addItem(self.keepUpdatedCheckBox)
 
 	def hasEntry(self, pattern):
 		for row in range(self.dictList.GetItemCount()):

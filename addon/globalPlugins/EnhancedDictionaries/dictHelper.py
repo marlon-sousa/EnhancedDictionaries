@@ -41,6 +41,7 @@ def syncFrom(self, source):
 def reloadDictionaries():
     from synthDriverHandler import getSynth
     synth = getSynth()
+
     loadProfileDict()
     loadVoiceDict(synth)
     profileName = config.conf.getActiveProfile().name
@@ -55,6 +56,7 @@ def reloadDictionaries():
 
         voiceDict = getDictionary("voice")
         voiceDict.syncFrom(source)
+
         log.debug(f"Saving and activating updated dictionaries for profile {profileName}")
         for dictType in ["default", "voice"]:
             dictionaries[dictType].save()
@@ -102,7 +104,8 @@ def getDictionary(type):
     dic.create(os.path.join(WritePaths.speechDictsDir, profile.name, f"{type}.dic"))
     log.debug(
         f"{type} dictionary was requested for profile {profile.name}, but the backing file does not exist."
-        f" A New dictionary was created, set to be backed by {dic.fileName} if it is ever saved."
+        f" A New dictionary was created, set to be backed by {dic.fileName}"
+        + "if it is ever saved."
     )
     return dic
 
