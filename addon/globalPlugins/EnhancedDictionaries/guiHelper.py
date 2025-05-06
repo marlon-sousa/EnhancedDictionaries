@@ -194,9 +194,12 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 		newDictionary = not os.path.exists(self.speechDict.fileName)
 		super().onOk(evt)
 
-		checkboxValue = self.keepUpdatedCheckBox.GetValue()
-		profileConfigurationHelper.saveCheckboxValueForProfile(checkboxValue)
-		log.info("salvo valor da checkbox:" + str(checkboxValue))
+		profileName = config.conf.getActiveProfile().name or "normal configuration"
+		if profileName != "normal configuration":
+			log.info("profile is " + config.conf.getActiveProfile().name)
+			checkboxValue = self.keepUpdatedCheckBox.GetValue()
+			profileConfigurationHelper.saveCheckboxValueForProfile(checkboxValue)
+			log.info("salvo valor da checkbox:" + str(checkboxValue))
 
 		if newDictionary:
 			# if we are saving a dictionary that didn't exist before (user just performed the first edition)
