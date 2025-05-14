@@ -177,11 +177,10 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 			profile = config.conf.getActiveProfile()
 			if profile.name != "normal configuration":
 				self.keepUpdatedCheckBox = wx.CheckBox(
-					self, label=_("$Sync entries with default profile dictionary.")
+					self, label=_("&Sync entries with default profile dictionary.")
 				)
 				savedCheckboxValue = profileConfigurationHelper.getSavedCheckboxValueForProfile()
 				self.keepUpdatedCheckBox.SetValue(savedCheckboxValue)
-				log.info("o valor da checkbox capturado é " + str(savedCheckboxValue))
 				sHelper.addItem(self.keepUpdatedCheckBox)
 
 	def hasEntry(self, pattern):
