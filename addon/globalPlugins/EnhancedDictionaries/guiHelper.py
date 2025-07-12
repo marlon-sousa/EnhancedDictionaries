@@ -105,7 +105,7 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 
 	def _makeTitle(self, title):
 		# Translators: The profile name for normal configuration
-		profileName = self._profile.name or "normal configuration"
+		profileName = self._profile.name or __("normal configuration")
 		return f"{title} - {profileName}"
 
 	def makeSettings(self, settingsSizer):
@@ -175,7 +175,7 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 			sHelper.addItem(bHelper)
 
 			profile = config.conf.getActiveProfile()
-			if profile.name != "normal configuration":
+			if profile.name != __("Normal configuration"):
 				self.keepUpdatedCheckBox = wx.CheckBox(
 					self, label=_("&Sync entries with default profile dictionary.")
 				)
@@ -195,10 +195,8 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 
 		profileName = config.conf.getActiveProfile().name or "normal configuration"
 		if profileName != "normal configuration":
-			log.info("profile is " + config.conf.getActiveProfile().name)
 			checkboxValue = self.keepUpdatedCheckBox.GetValue()
 			profileConfigurationHelper.saveCheckboxValueForProfile(checkboxValue)
-			log.info("salvo valor da checkbox:" + str(checkboxValue))
 
 		if newDictionary:
 			# if we are saving a dictionary that didn't exist before (user just performed the first edition)
