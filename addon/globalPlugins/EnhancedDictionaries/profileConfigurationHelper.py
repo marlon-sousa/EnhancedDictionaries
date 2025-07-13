@@ -11,7 +11,7 @@ def stringToBool(value):
 	return False
 
 
-def getSavedCheckboxValueForProfile():
+def getSavedKeepDictionaryUpdatedCheckboxValueForProfile():
 	if module not in config.conf:
 		log.info("o módulo não foi encontrado na configuração")
 		return False
