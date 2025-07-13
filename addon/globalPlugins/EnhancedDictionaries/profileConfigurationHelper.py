@@ -13,7 +13,7 @@ def stringToBool(value):
 
 def getSavedKeepDictionaryUpdatedCheckboxValueForProfile():
 	if module not in config.conf:
-		log.info("o módulo não foi encontrado na configuração")
+		log.debug(f"{module} not found on profile's configuration file")
 		return False
 	if KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY not in config.conf[module]:
 		log.info(f"{KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY} not found on {module}'s configuration")
