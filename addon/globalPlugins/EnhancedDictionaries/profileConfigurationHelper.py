@@ -15,8 +15,8 @@ def getSavedCheckboxValueForProfile():
 	if module not in config.conf:
 		log.info("o módulo não foi encontrado na configuração")
 		return False
-	if key not in config.conf[module]:
-		log.info("a chave não foi encontrada no módulo.")
+	if KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY not in config.conf[module]:
+		log.info(f"{KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY} not found on {module}'s configuration")
 		return False
 	return stringToBool(config.conf[module][key])
 
