@@ -196,7 +196,7 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 		profileName = config.conf.getActiveProfile().name or "normal configuration"
 		if profileName != "normal configuration":
 			checkboxValue = self.keepUpdatedCheckBox.GetValue()
-			profileConfigurationHelper.saveCheckboxValueForProfile(checkboxValue)
+			profileConfigurationHelper.saveKeepDictionaryUpdatedCheckboxValueForProfile(checkboxValue)
 
 		if newDictionary:
 			# if we are saving a dictionary that didn't exist before (user just performed the first edition)
