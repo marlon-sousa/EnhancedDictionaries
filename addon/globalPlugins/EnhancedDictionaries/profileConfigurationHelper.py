@@ -2,7 +2,7 @@ import config
 from logHandler import log
 
 module = 'EnhancedDictionaries'
-key = "keepUpdatedCheckbox"
+KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY = "keepUpdatedCheckbox"
 
 
 def stringToBool(value):
@@ -26,7 +26,6 @@ def saveKeepDictionaryUpdatedCheckboxValueForProfile(value):
 		config.conf[module] = {}
 	if KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY not in config.conf[module]:
 		config.conf[module][KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY] = value
-		```
 		config.conf.save()
 	if config.conf[module][KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY] != value:
 		config.conf[module][KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY] = value

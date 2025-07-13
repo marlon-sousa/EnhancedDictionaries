@@ -179,7 +179,9 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 				self.keepUpdatedCheckBox = wx.CheckBox(
 					self, label=_("&Sync entries with default profile dictionary.")
 				)
-				savedKeepDictionaryUpdatedCheckboxValue = profileConfigurationHelper.getSavedKeepDictionaryUpdatedCheckboxValueForProfile()
+				savedKeepDictionaryUpdatedCheckboxValue = (
+					profileConfigurationHelper.getSavedKeepDictionaryUpdatedCheckboxValueForProfile()
+				)
 				self.keepUpdatedCheckBox.SetValue(savedKeepDictionaryUpdatedCheckboxValue)
 				sHelper.addItem(self.keepUpdatedCheckBox)
 
