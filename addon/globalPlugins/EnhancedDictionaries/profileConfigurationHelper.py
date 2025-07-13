@@ -27,6 +27,6 @@ def saveCheckboxValueForProfile(value):
 	if key not in config.conf[module]:
 		config.conf[module][key] = value
 		config.conf.save()
-	if config.conf[module][key] != value:
-		config.conf[module][key] = value
+	if config.conf[module][KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY] != value:
+		config.conf[module][KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY] = value
 		config.conf.save()
