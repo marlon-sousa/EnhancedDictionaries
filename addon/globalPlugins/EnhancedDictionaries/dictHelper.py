@@ -46,7 +46,7 @@ def reloadDictionaries():
 	loadVoiceDict(synth)
 	profileName = config.conf.getActiveProfile().name
 
-	if profileConfigurationHelper.getSavedCheckboxValueForProfile():
+	if profileConfigurationHelper.getSavedKeepDictionaryUpdatedCheckboxValueForProfile():
 		sourceFileName = os.path.join(WritePaths.speechDictsDir, "default.dic")
 		source = speechDictHandler.SpeechDict()
 		source.load(sourceFileName)
