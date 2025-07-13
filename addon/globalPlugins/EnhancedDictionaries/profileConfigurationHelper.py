@@ -21,7 +21,7 @@ def getSavedKeepDictionaryUpdatedCheckboxValueForProfile():
 	return stringToBool(config.conf[module][KEEP_DICTIONARY_UPDATED_CONFIGURATION_KEY])
 
 
-def saveCheckboxValueForProfile(value):
+def saveKeepDictionaryUpdatedCheckboxValueForProfile(value):
 	if module not in config.conf:
 		config.conf[module] = {}
 	if key not in config.conf[module]:
