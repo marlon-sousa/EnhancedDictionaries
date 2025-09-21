@@ -1,8 +1,8 @@
-# EnhancedDictionaries 1.5.0
+# EnhancedDictionaries 1.6.0
 Nvda ADDON for handling more advanced dictionaries processing
 
 ## download
-Download the [Enhanced Dictionaries 1.5.0 addon](https://github.com/marlon-sousa/EnhancedDictionaries/releases/download/1.5.0/EnhancedDictionaries-1.5.0.nvda-addon)
+Download the [Enhanced Dictionaries 1.6.0 addon](https://github.com/marlon-sousa/EnhancedDictionaries/releases/download/1.6.0/EnhancedDictionaries-1.6.0.nvda-addon)
 
 ## Features
 
@@ -57,6 +57,7 @@ Simply install the addon. When it's active:
     - Entries that are not found on the dictionary being edited are added to it.
     - If an entry from the default (or voice) dictionary is found on the dictionary being edited, it does not overwrite the current entry.
     - The import does not save the new entries on disc. It just adds imported entries in the entries list in the dictionary dialog. Focus is placed on the list and the user then has the oportunity to review the new list of entries, as if they have typed by hand all of them.
+    - You can also choose to update the dictionary automatically whenever the dictionary on the default profile changes. To do this, check the `Sync entries with default profile dictionary` checkbox.
 
 *  Whenever the user creates a dictionary on a specific profile, it is effective immediately for that profile.
 * Whenever a profile changes, the specific dictionaries (default and voice) become active immediately. If these dictionaries do not exist, the default profile one's are used.
