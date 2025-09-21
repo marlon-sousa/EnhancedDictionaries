@@ -7,9 +7,10 @@
 import addonHandler
 import config
 from . import dictHelper
+from logHandler import log
+from . import profileConfigurationHelper
 import gui
 from gui import guiHelper
-from logHandler import log
 import speechDictHandler
 import os
 import wx
@@ -95,6 +96,7 @@ def showEnhancedDictionaryDialog(dic, title=None):
 # after the dialog closes
 class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 	PATTERN_COL = 1
+	keepUpdatedCheckBox = False
 
 	def __init__(self, parent, title, speechDict):
 		self._profile = config.conf.getActiveProfile()
@@ -170,7 +172,18 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 				label=_("&import entries from default profile dictionary")
 			).Bind(wx.EVT_BUTTON, self.onImportEntriesClick)
 
-		sHelper.addItem(bHelper)
+			sHelper.addItem(bHelper)
+
+			profile = config.conf.getActiveProfile()
+			if profile.name != __("Normal configuration"):
+				self.keepUpdatedCheckBox = wx.CheckBox(
+					self, label=_("&Sync entries with default profile dictionary.")
+				)
+				savedKeepDictionaryUpdatedCheckboxValue = (
+					profileConfigurationHelper.getSavedKeepDictionaryUpdatedCheckboxValueForProfile()
+				)
+				self.keepUpdatedCheckBox.SetValue(savedKeepDictionaryUpdatedCheckboxValue)
+				sHelper.addItem(self.keepUpdatedCheckBox)
 
 	def hasEntry(self, pattern):
 		for row in range(self.dictList.GetItemCount()):
@@ -181,11 +194,17 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 	def onOk(self, evt):
 		newDictionary = not os.path.exists(self.speechDict.fileName)
 		super().onOk(evt)
+
+		profileName = config.conf.getActiveProfile().name or "normal configuration"
+		if profileName != "normal configuration":
+			checkboxValue = self.keepUpdatedCheckBox.GetValue()
+			profileConfigurationHelper.saveKeepDictionaryUpdatedCheckboxValueForProfile(checkboxValue)
+
 		if newDictionary:
 			# if we are saving a dictionary that didn't exist before (user just performed the first edition)
 			# we have to activate it now, otherwise it will be effective only on next profile switch.
 			log.debug(f"Activating new dictionary {self.speechDict.fileName}")
-			dictHelper.reloadDictionaries()
+		dictHelper.reloadDictionaries()
 
 	def onImportEntriesClick(self, evt):
 		sourceFileName = self.speechDict.fileName.replace(f"{self._profile.name}\\", "")

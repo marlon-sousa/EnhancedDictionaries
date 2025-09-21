@@ -10,10 +10,12 @@ from logHandler import log
 import speechDictHandler
 from speechDictHandler import dictFormatUpgrade, dictionaries
 import os
+from . import profileConfigurationHelper
 
 
 # we need to inject these methods in speechDictHandler.SpeechDict class
-# they will be used to sync with other dictionaries and to create new dictionaries
+# they will be used to sync with other dictionaries
+# and to create new dictionaries
 # and will be called inside the dictionary dialog
 def patchSpeechDict():
 	speechDictHandler.SpeechDict.create = create
@@ -39,9 +41,26 @@ def syncFrom(self, source):
 def reloadDictionaries():
 	from synthDriverHandler import getSynth
 	synth = getSynth()
+
 	loadProfileDict()
 	loadVoiceDict(synth)
-	log.debug(f"loaded dictionaries for profile {config.conf.getActiveProfile().name or 'default'}")
+	profileName = config.conf.getActiveProfile().name
+
+	if profileConfigurationHelper.getSavedKeepDictionaryUpdatedCheckboxValueForProfile():
+		sourceFileName = os.path.join(WritePaths.speechDictsDir, "default.dic")
+		source = speechDictHandler.SpeechDict()
+		source.load(sourceFileName)
+
+		activeDict = getDictionary("default")
+		activeDict.syncFrom(source)
+
+		voiceDict = getDictionary("voice")
+		voiceDict.syncFrom(source)
+
+		log.debug(f"Saving and activating updated dictionaries for profile {profileName}")
+		for dictType in ["default", "voice"]:
+			dictionaries[dictType].save()
+	log.debug(f"loaded dictionaries for profile {profileName or 'default'}")
 
 
 def _getVoiceDictionary(profile):
@@ -85,7 +104,8 @@ def getDictionary(type):
 	dic.create(os.path.join(WritePaths.speechDictsDir, profile.name, f"{type}.dic"))
 	log.debug(
 		f"{type} dictionary was requested for profile {profile.name}, but the backing file does not exist."
-		f" A New dictionary was created, set to be backed by {dic.fileName} if it is ever saved."
+		f" A New dictionary was created, set to be backed by {dic.fileName}"
+		+ "if it is ever saved."
 	)
 	return dic
 
