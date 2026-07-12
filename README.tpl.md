@@ -57,7 +57,14 @@ Simply install the addon. When it's active:
     - Entries that are not found on the dictionary being edited are added to it.
     - If an entry from the default (or voice) dictionary is found on the dictionary being edited, it does not overwrite the current entry.
     - The import does not save the new entries on disc. It just adds imported entries in the entries list in the dictionary dialog. Focus is placed on the list and the user then has the oportunity to review the new list of entries, as if they have typed by hand all of them.
-    - You can also choose to update the dictionary automatically whenever the dictionary on the default profile changes. To do this, check the `Sync entries with default profile dictionary` checkbox.
+
+* Alternatively, you can keep a profile's dictionary continuously in sync with the default profile dictionary by checking the `Sync entries with default profile dictionary` checkbox.
+
+    Unlike the import button, which is an explicit one-off copy, this is a live overlay that behaves the following way:
+
+    - The default profile entries take effect for this profile without ever being written into the profile's dictionary, so they will not appear in the entries list.
+    - Entries are combined when speech is processed: your profile specific entries take priority, and any default profile entry whose pattern you have not overridden is applied on top of them.
+    - Because it is a live reference, adding or changing an entry in the default profile dictionary is picked up automatically by every synced profile, with no duplication and nothing to re-import.
 
 *  Whenever the user creates a dictionary on a specific profile, it is effective immediately for that profile.
 * Whenever a profile changes, the specific dictionaries (default and voice) become active immediately. If these dictionaries do not exist, the default profile one's are used.

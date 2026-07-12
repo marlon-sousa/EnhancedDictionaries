@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 # A part of the EnhancedDictionaries addon for NVDA
 # Copyright (C) 2020 Marlon Sousa
-# This file is covered by the GNU General Public License.
-# See the file COPYING.txt for more details.
+# This file is covered by the MIT License.
+# See the file LICENSE for more details.
 
 import addonHandler
 import config
@@ -11,11 +11,7 @@ from . import guiHelper
 import globalPluginHandler
 import globalVars
 from logHandler import log
-
-
-def _handlePostConfigProfileSwitch(resetSpeechIfNeeded=True):
-	log.debug("changing profile")
-	dictHelper.reloadDictionaries()
+import speechDictHandler
 
 
 def getActiveProfile(self):
@@ -45,17 +41,52 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	# we need that certain parts of NVDA behave differently than the original to insert our functionality
 	# for example, dictionaries menus need to activate our enhanced dictionary dialog and
 	# the classes handling the dictionary rules also need to be nodified to make more than they do.
-	# we also need to register ourselves to be notified whenever the active profile changes,
-	# so we can load the specific dictionaries.
+	# we also need to react whenever something that affects the effective dictionaries changes
+	# (profile switch, voice/synth change, dialog OK), so we can rebuild the in memory overlay.
 	def injectProcessing(self):
 		# add utility method to ConfigManager class to allow us to get the active profile in a giher level
 		config.ConfigManager.getActiveProfile = getActiveProfile
-		# subscribe ourselves to be notified when the active profile changes
-		config.post_configProfileSwitch.register(_handlePostConfigProfileSwitch)
 		# add methods to SpeechDict class
 		dictHelper.patchSpeechDict()
+		# register the single reactor that rebuilds the memory source dictionaries.
+		# extensionPoints keeps only weak references, so we hold strong ones for every
+		# callable we register, to keep them alive for the lifetime of the addon.
+		self._rebuildMemorySources = dictHelper.rebuildMemorySources
+		dictHelper.dictionariesChanged.register(self._rebuildMemorySources)
+		# fire the refresh hub whenever the active profile changes
+		config.post_configProfileSwitch.register(self._onProfileSwitch)
+		# wrap NVDA's loadVoiceDict, the single choke point through which the voice
+		# dictionary is reloaded (synth change, voice change, settings ring, speech
+		# settings dialog, ...). After NVDA reloads the global voice dict we fire the hub
+		# so the reactor reapplies the profile voice overlay on top of it.
+		self._originalLoadVoiceDict = speechDictHandler.loadVoiceDict
+		speechDictHandler.loadVoiceDict = self._loadVoiceDictAndRebuild
 		# redirect menus to show the enhanced dictionaries dialog
 		self.patchMenus()
+		# build the initial overlay for the currently active profile
+		dictHelper.dictionariesChanged.notify()
+
+	def terminate(self):
+		if not globalVars.appArgs.secure:
+			try:
+				speechDictHandler.loadVoiceDict = self._originalLoadVoiceDict
+				config.post_configProfileSwitch.unregister(self._onProfileSwitch)
+				dictHelper.dictionariesChanged.unregister(self._rebuildMemorySources)
+			except Exception:
+				log.error("error while unregistering EnhancedDictionaries reactors", exc_info=True)
+		super(GlobalPlugin, self).terminate()
+
+	def _onProfileSwitch(self, *args, **kwargs):
+		log.debug("changing profile")
+		dictHelper.dictionariesChanged.notify()
+
+	def _loadVoiceDictAndRebuild(self, synth):
+		# let NVDA reload the global voice dictionary into the definition, then fire the
+		# hub so the reactor reapplies the profile voice overlay. The synth is passed
+		# through because NVDA calls this while the synth is still being instantiated,
+		# when synthDriverHandler.getSynth() would not yet return it.
+		self._originalLoadVoiceDict(synth)
+		dictHelper.dictionariesChanged.notify(synth=synth)
 
 	def patchMenus(self):
 		standardDictionaryMenu = guiHelper.getDefaultDictionaryMenu()

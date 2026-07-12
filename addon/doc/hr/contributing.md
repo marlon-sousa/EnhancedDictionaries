@@ -4,13 +4,30 @@
 
 Trebat će vam:
 
-* Python 3.6 ili noviji.
+* Python 3.13 ili noviji.
 *Konfigurirani pip
 * Scons (pip install scons)
 * Markdown (pip install markdown)
-* Msgfmt uslužni program. Najlakši način da ga dobijete je instaliranjem Git Basha i odabirom uključivanja Bash alata u naredbenom retku.
+* gettext, koji pruža alate `msgfmt` i `xgettext`. `msgfmt` kompilira datoteke prijevoda pri svakoj izradi, a `xgettext` koristi `scons pot` za generiranje predloška prijevoda. Na sustavu Windows instalirajte modernu verziju s [gettext-iconv-windows](https://github.com/mlocati/gettext-iconv-windows/releases) (ili upotrijebite `scoop install gettext` / `choco install gettext`) i provjerite da se njegov `bin` direktorij nalazi ispred bilo kojeg drugog gettexta u vašem PATH-u. Nemojte koristiti GnuWin32 gettext paket: zamrznut je na verziji 0.14.4 (2005) i prestar je za ovu izradu (`scons pot` ne uspijeva zbog nepodržane opcije `--package-name`).
 
 Nakon što sve instalirate, izdavanje scons-a u korijenu projekta trebalo bi izgraditi dodatak i generirati dokumente.
+
+### Pre-commit
+
+Snažno se preporučuje da instalirate pre-commit.
+
+* pip install pre-commit
+* pre-commit install
+
+Ovo instalira pre-commit i konfigurira njegove hookove, tako da će se prilikom svakog commita primijeniti nekoliko provjera. Ako bilo koja od njih ne uspije, commit neće biti dopušten.
+
+Provjere pre-commita možete pokrenuti u bilo kojem trenutku bez izvršavanja commita naredbom "pre-commit run --all-files".
+
+### Flake8
+
+Jedan od pre-commit hookova je Flake8, Python linter koji, između ostalog, pomaže osigurati da projekt ima dosljedno oblikovanje i da su na snazi dobre prakse.
+
+Flake8 hook pre-commita koristi istu konfiguraciju iz `flake8.ini`.
 
 ## Prijevodi
 

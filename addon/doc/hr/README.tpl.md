@@ -58,6 +58,14 @@ Ako to učini, novi će rječnik biti učinkovit. Ako poništi dijaloški okvir,
     - Ako se unos iz zadanog (ili glasovnog) rječnika pronađe u rječniku koji se uređuje, on neće prebrisati trenutni unos.
     - Uvoz ne sprema nove unose na disk. Samo dodaje uvezene unose na popis unosa u dijaloškom okviru rječnika. Fokus se stavlja na popis i korisnik zatim ima priliku pregledati novi popis unosa, kao da ih je sve ručno upisao.
 
+* Alternativno, možete rječnik profila trajno održavati usklađenim sa zadanim profilom rječnika označavanjem potvrdnog okvira "Sinkroniziraj unose sa zadanim profilom rječnika".
+
+    Za razliku od gumba za uvoz, koji je izričito jednokratno kopiranje, ovo je živi sloj koji se ponaša na sljedeći način:
+
+    - Unosi zadanog profila stupaju na snagu za ovaj profil, a da se nikada ne zapisuju u rječnik profila, pa se stoga neće pojaviti na popisu unosa.
+    - Unosi se kombiniraju pri obradi govora: vaši unosi specifični za profil imaju prednost, a svaki unos iz zadanog profila čiji uzorak niste nadjačali primjenjuje se povrh njih.
+    - Budući da je riječ o živoj referenci, dodavanje ili promjena unosa u zadanom profilu rječnika automatski preuzima svaki sinkronizirani profil, bez dupliciranja i bez potrebe za ponovnim uvozom.
+
 * Kad god korisnik kreira rječnik na određenom profilu, on odmah stupa na snagu za taj profil.
 * Kad god se profil promijeni, određeni rječnici (zadani i glasovni) odmah postaju aktivni. Ako ti rječnici ne postoje, koristi se zadani profil.
 * To ne utječe na ugrađene i privremene rječnike, ne ovise o profilima, potonji jer je privremen, prvi jer je ugrađen.

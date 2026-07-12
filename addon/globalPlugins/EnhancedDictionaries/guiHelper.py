@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 # A part of the EnhancedDictionaries addon for NVDA
 # Copyright (C) 2020 Marlon Sousa
-# This file is covered by the GNU General Public License.
-# See the file COPYING.txt for more details.
+# This file is covered by the MIT License.
+# See the file LICENSE for more details.
 
 import addonHandler
 import config
@@ -11,8 +11,7 @@ from logHandler import log
 from . import profileConfigurationHelper
 import gui
 from gui import guiHelper
-import speechDictHandler
-import os
+from speechDictHandler import SpeechDict
 import wx
 
 # this addon mostly complements NVDA functionalities.
@@ -118,13 +117,17 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 		)
 		# Translators: The label for a column in dictionary entries list used to identify comments for the entry.
 		self.dictList.InsertColumn(0, __("Comment"), width=150)
-		# Translators: The label for a column in dictionary entries list used to identify pattern (original word or a pattern). # noqa: E501
+		# Translators: The label for a column in dictionary entries list used to identify pattern
+		# (original word or a pattern).
 		self.dictList.InsertColumn(1, __("Pattern"), width=150)
-		# Translators: The label for a column in dictionary entries list and in a list of symbols from symbol pronunciation dialog used to identify replacement for a pattern or a symbol # noqa: E501
+		# Translators: The label for a column in dictionary entries list and in a list of symbols
+		# from symbol pronunciation dialog used to identify replacement for a pattern or a symbol
 		self.dictList.InsertColumn(2, __("Replacement"), width=150)
-		# Translators: The label for a column in dictionary entries list used to identify whether the entry is case sensitive or not. # noqa: E501
+		# Translators: The label for a column in dictionary entries list used to identify
+		# whether the entry is case sensitive or not.
 		self.dictList.InsertColumn(3, __("case"), width=50)
-		# Translators: The label for a column in dictionary entries list used to identify whether the entry is a regular expression, matches whole words, or matches anywhere. # noqa: E501
+		# Translators: The label for a column in dictionary entries list used to identify
+		# whether the entry is a regular expression, matches whole words, or matches anywhere.
 		self.dictList.InsertColumn(4, __("Type"), width=50)
 		self.offOn = (__("off"), __("on"))
 		for entry in self.tempSpeechDict:
@@ -165,7 +168,7 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 		).Bind(wx.EVT_BUTTON, self.onRemoveAll)
 
 		# name of the default profile is always set to None on NVDA
-		if(self._profile.name):
+		if self._profile.name:
 			bHelper.addButton(
 				parent=self,
 				# Translators: The label for the import entries from default profile dictionary
@@ -175,7 +178,7 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 			sHelper.addItem(bHelper)
 
 			profile = config.conf.getActiveProfile()
-			if profile.name != __("Normal configuration"):
+			if profile.name:
 				self.keepUpdatedCheckBox = wx.CheckBox(
 					# Translators: The name of the "keep the profile dictionary in sync" checkbox
 					self, label=_("&Sync entries with default profile dictionary")
@@ -193,24 +196,23 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 		return False
 
 	def onOk(self, evt):
-		newDictionary = not os.path.exists(self.speechDict.fileName)
+		# super().onOk saves the edited (profile-own on named profiles, global on the
+		# normal profile) dictionary to its own file. It never touches the in memory
+		# overlay that NVDA processes.
 		super().onOk(evt)
 
-		profileName = config.conf.getActiveProfile().name or "normal configuration"
-		if profileName != "normal configuration":
+		if self._profile.name:
 			checkboxValue = self.keepUpdatedCheckBox.GetValue()
 			profileConfigurationHelper.saveKeepDictionaryUpdatedCheckboxValueForProfile(checkboxValue)
 
-		if newDictionary:
-			# if we are saving a dictionary that didn't exist before (user just performed the first edition)
-			# we have to activate it now, otherwise it will be effective only on next profile switch.
-			log.debug(f"Activating new dictionary {self.speechDict.fileName}")
-		dictHelper.reloadDictionaries()
+		# rebuild the memory source dictionaries so the just saved edits (and the sync
+		# checkbox) take effect immediately, without waiting for the next profile switch.
+		dictHelper.dictionariesChanged.notify()
 
 	def onImportEntriesClick(self, evt):
 		sourceFileName = self.speechDict.fileName.replace(f"{self._profile.name}\\", "")
 		log.debug(f"Importing entries from default dictionary at {sourceFileName}")
-		source = speechDictHandler.SpeechDict()
+		source = SpeechDict()
 		source.load(sourceFileName)
 		self.tempSpeechDict.syncFrom(source)
 		for entry in self.tempSpeechDict:
