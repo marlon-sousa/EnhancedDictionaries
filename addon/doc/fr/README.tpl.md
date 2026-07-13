@@ -58,6 +58,14 @@ Simplement installer l'extension et lorsqu'elle est active, vous remarquerez les
     - Si une entrée du dictionnaire  Défaut (ou voix) se trouve sur le dictionnaire étant édité, elle ne remplace pas l'entrée actuelle.
     - L'importation ne sauvegarde pas les nouvelles entrées sur le disque. Il ajoute simplement des entrées importées dans la liste des entrées dans la boîte de dialogue de dictionnaire. Le focus est mis sur la liste et l'utilisateur a la possibilité d'examiner la nouvelle liste  d'entrées, Comme s'il les avait tous écrite manuellement.
 
+* Alternativement, vous pouvez garder le dictionnaire d'un profil continuellement synchronisé avec le dictionnaire du profil par défaut en cochant la case "Synchroniser les entrées avec le dictionnaire du profil par défaut".
+
+    Contrairement au bouton d'importation, qui est une copie ponctuelle et explicite, il s'agit d'une superposition en direct qui se comporte comme suit :
+
+    - Les entrées du profil par défaut prennent effet pour ce profil sans jamais être écrites dans le dictionnaire du profil, elles n'apparaîtront donc pas dans la liste des entrées.
+    - Les entrées sont combinées lors du traitement de la parole : vos entrées spécifiques au profil ont la priorité, et toute entrée du profil par défaut dont vous n'avez pas redéfini le modèle est appliquée par-dessus.
+    - Comme il s'agit d'une référence en direct, l'ajout ou la modification d'une entrée dans le dictionnaire du profil par défaut est repris automatiquement par chaque profil synchronisé, sans duplication et sans rien à réimporter.
+
 * Chaque fois que l'utilisateur crée un dictionnaire pour un profil spécifique, ce dictionnaire est immédiatement associé à ce profil.
 * Chaque fois qu'un profil change, les dictionnaires spécifiques (Défaut et Voix) deviennent actifs immédiatement. Si ces dictionnaires n'existent pas, ceux du profil par défaut seront utilisés.
 * Les dictionnaires intégrés et temporaires ne sont pas affectés car ils ne dépendent pas des profils, le dernier pour être temporaire et le premier pour être intégré.

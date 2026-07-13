@@ -63,6 +63,14 @@ Instale o extra e quando ele estiver activo, observará o seguinte:
     - Se uma entrada do dicionário padrão (ou de voz) for encontrada no dicionário que está a ser editado, não substituirá a entrada actual.
     - A importação não guarda as novas entradas no disco. Apenas adiciona entradas importadas na lista de entradas na caixa de diálogo do dicionário. O foco é colocado na lista e o utilizador tem a oportunidade de rever a nova lista de entradas, como se as tivesse escrito, manualmente, a todas elas.
 
+* Em alternativa, pode manter o dicionário de um perfil continuamente sincronizado com o dicionário do perfil padrão, marcando a caixa de verificação "Sincronizar entradas com o dicionário do perfil padrão".
+
+    Ao contrário do botão de importação, que é uma cópia pontual e explícita, esta é uma sobreposição em tempo real que se comporta da seguinte maneira:
+
+    - As entradas do perfil padrão tornam-se efectivas para este perfil sem nunca serem gravadas no dicionário do perfil, pelo que não aparecerão na lista de entradas.
+    - As entradas são combinadas quando a fala é processada: as suas entradas específicas do perfil têm prioridade, e qualquer entrada do perfil padrão cujo padrão não tenha sido substituído é aplicada por cima delas.
+    - Por ser uma referência em tempo real, ao adicionar ou alterar uma entrada no dicionário do perfil padrão, cada perfil sincronizado passa a usá-la automaticamente, sem duplicação e sem nada a reimportar.
+
 * Sempre que o utilizador cria um dicionário para um perfil específico, esse dicionário é imediatamente associado a esse perfil.
 * Sempre que um perfil muda, os seus dicionários específicos (padrão e de voz) ficam activos imediatamente. Se esses dicionários não existirem, os do perfil padrão serão usados.
 * Os dicionários embutidos e temporários não são afectados, pois não dependem de perfis, o último por ser temporário e o primeiro por ser embutido.

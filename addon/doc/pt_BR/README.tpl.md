@@ -84,6 +84,14 @@ deixarão de ser aplicadas.
     no diálogo de configurar o dicionário. O foco é colocado na lista e o usuário tem a oportunidade de revisar a nova lista de entradas, como se tivesse digitado
     manualmente todas elas.
 
+* Alternativamente, você pode manter o dicionário de um perfil continuamente sincronizado com o dicionário do perfil padrão marcando a caixa de seleção "Sincronizar entradas com o dicionário do perfil padrão".
+
+    Diferentemente do botão de importar, que é uma cópia pontual e explícita, esta é uma sobreposição ao vivo que funciona da seguinte maneira:
+
+    - As entradas do perfil padrão entram em efeito para este perfil sem nunca serem gravadas no dicionário do perfil, portanto não aparecerão na lista de entradas.
+    - As entradas são combinadas quando a fala é processada: as suas entradas específicas do perfil têm prioridade, e qualquer entrada do perfil padrão cujo padrão você não tenha sobrescrito é aplicada sobre elas.
+    - Por ser uma referência ao vivo, adicionar ou alterar uma entrada no dicionário do perfil padrão é captado automaticamente por todos os perfis sincronizados, sem duplicação e sem nada para reimportar.
+
 * Sempre que o usuário cria um dicionário em um perfil específico, ele entra em efeito imediatamente para esse perfil.
 * Sempre que um perfil muda, os dicionários específicos (padrão e voz) ficam ativos imediatamente.
 

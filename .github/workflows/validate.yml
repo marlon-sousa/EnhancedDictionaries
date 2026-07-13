@@ -1,0 +1,60 @@
+name: Validate Add-on
+
+on:
+    workflow_call:
+        inputs:
+            upload_artifacts:
+                description: Upload build artifacts for this validation run
+                required: false
+                type: boolean
+                default: false
+        outputs:
+            artifact_url:
+                description: URL for the uploaded artifact (when upload_artifacts is true)
+                value: ${{ jobs.build_and_check.outputs.artifact_url }}
+    workflow_dispatch:
+
+jobs:
+    build_and_check:
+        runs-on: ubuntu-latest
+        env:
+            ARTIFACT_RETENTION_DAYS: 7
+        outputs:
+            artifact_url: ${{ steps.upload_build_artifacts.outputs.artifact-url }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Install system dependencies
+              run: sudo apt install gettext
+
+            - name: Install Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.13"
+
+            - name: Install Python dependencies
+              run: |
+                  pip install pre-commit
+                  pip install scons
+                  pip install markdown
+
+            - name: Code checks
+              run: pre-commit run --all-files
+
+            - name: Build addon and pot
+              run: |
+                  rm -f *.nvda-addon *.pot || true
+                  scons
+                  scons pot
+
+            - name: Upload build artifacts
+              id: upload_build_artifacts
+              if: ${{ inputs.upload_artifacts }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: packaged_addon
+                  retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
+                  path: |
+                      ./*.nvda-addon
+                      ./*.pot

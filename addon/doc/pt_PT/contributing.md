@@ -4,13 +4,30 @@
 
 Para  isso, vai precisar de:
 
-* python 3.6 ou superior
+* python 3.13.
 * O pip deve estar configurado
 * scons (pip install scons)
 * markdown (pip install markdown)
-* comando msgfmt. A maneira mais simples de obtê-lo é instalar o git e, na instalação, escolher a opção para tornar as ferramentas do bash disponíveis para o prompt de comandos
+* gettext, que fornece os utilitários `msgfmt` e `xgettext`. O `msgfmt` compila os ficheiros de tradução em cada compilação, e o `xgettext` é usado pelo `scons pot` para gerar o modelo de tradução. No Windows, instale uma versão moderna a partir do [gettext-iconv-windows](https://github.com/mlocati/gettext-iconv-windows/releases) (ou use `scoop install gettext` / `choco install gettext`), e certifique-se de que a pasta `bin` dele vem antes de qualquer outro gettext no seu PATH. Não use o pacote gettext do GnuWin32: está congelado na versão 0.14.4 (2005) e é demasiado antigo para esta compilação (o `scons pot` falha na opção não suportada `--package-name`).
 
 Uma vez que estes ítems estejam instalados, basta escrever scons na pasta raíz do projecto para criar o extra  
+
+### Pré-commit
+
+É altamente recomendável que instale o pre-commit.
+
+* pip install pre-commit
+* pre-commit install
+
+Isto instala o pre-commit e configura os seus hooks, de modo que sempre que fizer um commit várias verificações serão aplicadas. Se alguma delas falhar, o commit não será permitido.
+
+Pode executar as verificações do pre-commit a qualquer momento, sem fazer um commit, executando "pre-commit run --all-files".
+
+### Flake8
+
+Um dos hooks do pre-commit é o Flake8, um linter de Python que, entre outras coisas, ajuda a garantir que o projecto tenha uma formatação consistente e que boas práticas sejam seguidas.
+
+O hook Flake8 do pre-commit usa a mesma configuração do `flake8.ini`.
 
 ## Contribuir para as traduções
 

@@ -1,32 +1,34 @@
 # -*- coding: UTF-8 -*-
 # A part of the EnhancedDictionaries addon for NVDA
 # Copyright (C) 2020 Marlon Sousa
-# This file is covered by the GNU General Public License.
-# See the file COPYING.txt for more details.
+# This file is covered by the MIT License.
+# See the file LICENSE for more details.
 
 import config
+import extensionPoints
 from NVDAState import WritePaths
 from logHandler import log
 import speechDictHandler
-from speechDictHandler import dictFormatUpgrade, dictionaries
+from speechDictHandler import dictFormatUpgrade, dictionaries, SpeechDict
 import os
 from . import profileConfigurationHelper
 
 
-# we need to inject these methods in speechDictHandler.SpeechDict class
-# they will be used to sync with other dictionaries
-# and to create new dictionaries
-# and will be called inside the dictionary dialog
+# Addon-owned refresh hub.
+# Every trigger that could change the effective (memory source) dictionaries fires
+# this action; the single registered reactor (rebuildMemorySources) does the work.
+# This keeps the rebuild logic in exactly one place. See __init__.py for the wiring
+# and for the strong references that keep the reactors alive (extensionPoints uses
+# weak references).
+dictionariesChanged = extensionPoints.Action()
+
+
+# we inject this method in speechDictHandler.SpeechDict so a dictionary can be
+# augmented with the entries of another one (patterns already present are kept).
+# It is used both when building the overlay memory source and by the "import entries
+# from default profile dictionary" button in the dialog.
 def patchSpeechDict():
-	speechDictHandler.SpeechDict.create = create
 	speechDictHandler.SpeechDict.syncFrom = syncFrom
-
-
-def create(self, fileName):
-	if os.path.exists(fileName):
-		raise f"can not create dictionary backed by file {fileName}"
-	self.fileName = fileName
-	log.debug("creating dictionary with file '%s'." % fileName)
 
 
 def syncFrom(self, source):
@@ -35,101 +37,130 @@ def syncFrom(self, source):
 			self.append(entry)
 
 
-# the functions below would be inserted right in speechDictHandler module
-# as they are specific for this addon, we don't need to inject them.
-# We will ratter use them right from this module
-def reloadDictionaries():
-	from synthDriverHandler import getSynth
-	synth = getSynth()
+def _keepDictionaryUpdated():
+	return profileConfigurationHelper.getSavedKeepDictionaryUpdatedCheckboxValueForProfile()
 
-	loadProfileDict()
-	loadVoiceDict(synth)
+
+# ---------------------------------------------------------------------------
+# Memory sources (what NVDA actually processes).
+#
+# NVDA processes speechDictHandler.dictionaries[type] for each type in dictTypes
+# (see speechDictHandler.processText). Those objects are our memory sources. We never
+# write them to disk; we rebuild their contents in place on every relevant trigger so:
+# - Normal profile              -> global entries only (plain NVDA behaviour).
+# - Named profile, sync off     -> profile-own entries only (isolated).
+# - Named profile, sync on      -> profile-own first, then global entries whose pattern
+#                                  is not already present (profile wins), applied in
+#                                  NVDA's single sub pass for that dictionary.
+# Base and global entries are loaded fresh from disk on each rebuild, so a new entry in
+# the main dictionary is picked up live by every synced profile with zero duplication.
+# ---------------------------------------------------------------------------
+def rebuildMemorySources(synth=None):
 	profileName = config.conf.getActiveProfile().name
-
-	if profileConfigurationHelper.getSavedKeepDictionaryUpdatedCheckboxValueForProfile():
-		sourceFileName = os.path.join(WritePaths.speechDictsDir, "default.dic")
-		source = speechDictHandler.SpeechDict()
-		source.load(sourceFileName)
-
-		activeDict = getDictionary("default")
-		activeDict.syncFrom(source)
-
-		voiceDict = getDictionary("voice")
-		voiceDict.syncFrom(source)
-
-		log.debug(f"Saving and activating updated dictionaries for profile {profileName}")
-		for dictType in ["default", "voice"]:
-			dictionaries[dictType].save()
-	log.debug(f"loaded dictionaries for profile {profileName or 'default'}")
+	_rebuildDefaultMemorySource()
+	_rebuildVoiceMemorySource(synth)
+	log.debug(f"Rebuilt memory source dictionaries for profile {profileName or 'normal configuration'}")
 
 
-def _getVoiceDictionary(profile):
-	from synthDriverHandler import getSynth
-	synth = getSynth()
-	dictionaryFilename = _getVoiceDictionaryFileName(synth)
-	# if we are om default profile or the specific dictionary profile is already loaded
-	if not profile.name or _hasVoiceDictionaryProfile(profile.name, synth.name, dictionaryFilename):
-		# we are with the correct dictionary loaded. Just return it.
-		log.debug(f"Voice dictionary, backed by {dictionaries['voice'].fileName} was requested")
-		return dictionaries["voice"]
-	# we are on a user profile for which there is no dictionary created for the current voice.
-	# The current loaded dictionary is the default profile one.
-	# As we have beem called to get the profile dictionary for the current voice and it still does not exist,
-	# We will create it now and pass the new, empty dictionary to the caller, but won't save it.
-	# This is a task the caller should do when and if they wish
-	dic = speechDictHandler.SpeechDict()
-	dic.create(os.path.join(getProfileVoiceDictsPath(), synth.name, dictionaryFilename))
-	log.debug(
-		f"voice dictionary was requested for profile {profile.name}, but the backing file does not exist."
-		f" A New dictionary was created, set to be backed by {dic.fileName} if it is ever saved."
-	)
-	return dic
+def _rebuildDefaultMemorySource():
+	profile = config.conf.getActiveProfile()
+	memorySource = dictionaries["default"]
+	globalFileName = WritePaths.speechDictDefaultFile
+	if not profile.name:
+		# Normal profile: the memory source is the global default dictionary.
+		memorySource.load(globalFileName)
+		return
+	# Named profile: profile-own entries, optionally overlaid with the global ones.
+	# load() clears the dictionary (leaving it empty when the file is missing) and sets
+	# fileName; we never save this object, so pointing it at the profile file is only for
+	# coherence.
+	profileFileName = os.path.join(WritePaths.speechDictsDir, profile.name, "default.dic")
+	memorySource.load(profileFileName)
+	if _keepDictionaryUpdated():
+		globalDict = SpeechDict()
+		globalDict.load(globalFileName)
+		memorySource.syncFrom(globalDict)
 
 
+def _rebuildVoiceMemorySource(synth=None):
+	# When the rebuild is triggered by NVDA reloading the voice dictionary, the synth is
+	# passed explicitly: at that moment synthDriverHandler._curSynth may not be set yet
+	# (the synth is still being instantiated), so getSynth() would return None. For the
+	# other triggers (profile switch, dialog OK) we look the active synth up ourselves.
+	if synth is None:
+		from synthDriverHandler import getSynth
+		synth = getSynth()
+	if synth is None:
+		return
+	profile = config.conf.getActiveProfile()
+	memorySource = dictionaries["voice"]
+	baseName = _getVoiceDictionaryFileName(synth)
+	globalFileName = os.path.join(WritePaths.voiceDictsDir, synth.name, baseName)
+	if not profile.name:
+		# Normal profile: the memory source is the global voice dictionary. NVDA reloads
+		# this itself on synth/voice change (loadVoiceDict) before we run, so we simply
+		# keep it in sync here.
+		memorySource.load(globalFileName)
+		return
+	profileFileName = os.path.join(getProfileVoiceDictsPath(), synth.name, baseName)
+	memorySource.load(profileFileName)
+	if _keepDictionaryUpdated():
+		globalDict = SpeechDict()
+		globalDict.load(globalFileName)
+		memorySource.syncFrom(globalDict)
+
+
+# ---------------------------------------------------------------------------
+# Editable dictionaries (what the dialog shows and saves).
+#
+# On the normal profile this is the global dictionary itself (editing it is normal NVDA
+# behaviour), which is also the memory source. On a named profile it is a separate
+# SpeechDict backed by the profile-own .dic file (empty if the file does not exist yet);
+# saving it and firing dictionariesChanged rebuilds the memory source.
+# ---------------------------------------------------------------------------
 def getDictionary(type):
 	profile = config.conf.getActiveProfile()
-	if(type == "voice"):
-		return _getVoiceDictionary(profile)
-	# if we are om default profile or the specific dictionary profile is already loaded
-	if not profile.name or _hasDictionaryProfile(profile.name, f"{type}.dic"):
-		# we are with the correct dictionary loaded. Just return it.
-		log.debug(f"{type} dictionary, backed by {dictionaries[type].fileName} was requested")
-		return dictionaries[type]
-	# we are on a user profile for which there is no dictionary created.
-	# The current loaded dictionary is the default profile one.
-	# As we have beem called to get the current profile dictionary and it still does not exist,
-	# We will create it now and pass the new, empty dictionary to the caller, but won't save it.
-	# This is a task the caller should do when and if they wish
-	dic = speechDictHandler.SpeechDict()
-	dic.create(os.path.join(WritePaths.speechDictsDir, profile.name, f"{type}.dic"))
-	log.debug(
-		f"{type} dictionary was requested for profile {profile.name}, but the backing file does not exist."
-		f" A New dictionary was created, set to be backed by {dic.fileName}"
-		+ "if it is ever saved."
-	)
+	if type == "voice":
+		return _getEditableVoiceDictionary(profile)
+	return _getEditableDefaultDictionary(profile)
+
+
+def _getEditableDefaultDictionary(profile):
+	if not profile.name:
+		# Normal profile: edit the global (memory source) dictionary directly.
+		log.debug(f"Default dictionary, backed by {dictionaries['default'].fileName} was requested")
+		return dictionaries["default"]
+	profileFileName = os.path.join(WritePaths.speechDictsDir, profile.name, "default.dic")
+	return _loadEditableDictionary(profileFileName)
+
+
+def _getEditableVoiceDictionary(profile):
+	from synthDriverHandler import getSynth
+	synth = getSynth()
+	if not profile.name:
+		# Normal profile: edit the global (memory source) voice dictionary directly.
+		log.debug(f"Voice dictionary, backed by {dictionaries['voice'].fileName} was requested")
+		return dictionaries["voice"]
+	baseName = _getVoiceDictionaryFileName(synth)
+	profileFileName = os.path.join(getProfileVoiceDictsPath(), synth.name, baseName)
+	return _loadEditableDictionary(profileFileName)
+
+
+def _loadEditableDictionary(fileName):
+	# Return the profile-own dictionary, loading it if the file exists.
+	# When the file does not exist yet we hand back an empty dictionary that already
+	# knows where it will be saved, so the first edition creates the file on dialog OK.
+	dic = SpeechDict()
+	if os.path.exists(fileName):
+		dic.load(fileName)
+		log.debug(f"profile dictionary backed by {fileName} was requested")
+	else:
+		dic.fileName = fileName
+		log.debug(
+			f"profile dictionary was requested, but the backing file {fileName} does not exist."
+			" A new empty dictionary was created, to be saved there if it is ever edited."
+		)
 	return dic
-
-
-def loadProfileDict():
-	profile = config.conf.getActiveProfile()
-	if _hasDictionaryProfile(profile.name, "default.dic"):
-		_loadProfileDictionary(dictionaries["default"], profile.name, "default.dic")
-	else:
-		dictionaries["default"].load(os.path.join(WritePaths.speechDictsDir, "default.dic"))
-	dictionaries["builtin"].load("builtin.dic")
-
-
-def loadVoiceDict(synth):
-	"""Loads appropriate dictionary for the given synthesizer.
-It handles case when the synthesizer doesn't support voice setting.
-"""
-	dictionaryFileName = _getVoiceDictionaryFileName(synth)
-	profile = config.conf.getActiveProfile()
-	if(_hasVoiceDictionaryProfile(profile.name, synth.name, dictionaryFileName)):
-		_loadProfileVoiceDictionary(dictionaries["voice"], synth.name, dictionaryFileName)
-	else:
-		fileName = os.path.join(WritePaths.voiceDictsDir, synth.name, dictionaryFileName)
-		dictionaries["voice"].load(fileName)
 
 
 def _getVoiceDictionaryFileName(synth):
@@ -146,22 +177,6 @@ def _getVoiceDictionaryFileName(synth):
 	return baseName
 
 
-def _hasDictionaryProfile(profileName, dictionaryName):
-	return os.path.exists(os.path.join(WritePaths.speechDictsDir, profileName or "", dictionaryName))
-
-
 def getProfileVoiceDictsPath():
 	profile = config.conf.getActiveProfile()
 	return os.path.join(WritePaths.speechDictsDir, profile.name or "", r"voiceDicts.v1")
-
-
-def _hasVoiceDictionaryProfile(profileName, synthName, voiceName):
-	return os.path.exists(os.path.join(getProfileVoiceDictsPath(), synthName, voiceName))
-
-
-def _loadProfileDictionary(target, profileName, dictionaryName):
-	target.load(os.path.join(WritePaths.speechDictsDir, profileName or "", dictionaryName))
-
-
-def _loadProfileVoiceDictionary(target, synthName, voiceName):
-	target.load(os.path.join(getProfileVoiceDictsPath(), synthName, voiceName))

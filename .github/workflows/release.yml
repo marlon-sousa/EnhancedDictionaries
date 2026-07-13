@@ -1,0 +1,129 @@
+name: Release Add-on
+
+on:
+    push:
+        tags:
+            - "**"
+    workflow_dispatch:
+
+jobs:
+    validate:
+        uses: ./.github/workflows/validate.yml
+        with:
+            upload_artifacts: false
+
+    release_addon:
+        if: startsWith(github.ref, 'refs/tags/')
+        needs: [validate]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses:
+                  actions/checkout@v4
+
+                  # The next step is used to fix a small issue here to obtain the current tag message,
+                  # which will be used as the release body. For more details:
+                  # https://github.com/actions/checkout/issues/290
+            - name: Make sure we have the correct tag information
+              run: git fetch --tags --force
+
+            - name: Obtain tag message
+              uses: ericcornelissen/git-tag-annotation-action@v2
+              id: tag-data
+
+            - name: Check differences to master branch
+              id: differences-to-master
+              run: |
+                  git fetch origin master --depth=1
+                  if git diff origin/master --exit-code; then
+                    echo "changes_exist=false" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "changes_exist=true" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Abort if tag is not applied on top of master
+              if: steps.differences-to-master.outputs.changes_exist == 'true'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      core.setFailed('Releases can be generated only from commit on head of master branch')
+
+            - name: Install system dependencies
+              run: sudo apt install gettext
+
+            - name: Install Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.13"
+
+            - name: Install Python dependencies
+              run: |
+                  pip install scons
+                  pip install markdown
+
+            - name: Generate addon
+              run: |
+                  rm -f *.nvda-addon || true
+                  scons
+
+            - name: Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  files: "*.nvda-addon"
+                  body: "${{ steps.tag-data.outputs.git-tag-annotation }}"
+                  fail_on_unmatched_files: true
+                  generate_release_notes: false
+
+            - name: Submit to NVDA Add-on Store
+              id: submit-datastore
+              if: github.repository == 'marlon-sousa/EnhancedDictionaries'
+              env:
+                  GH_TOKEN: ${{ secrets.ADDON_DATASTORE_TOKEN }}
+                  TAG_NAME: ${{ github.ref_name }}
+                  REPO_URL: https://github.com/${{ github.repository }}
+              run: |
+                  if [ -z "$GH_TOKEN" ]; then
+                    echo "ADDON_DATASTORE_TOKEN is not configured; skipping submission."
+                    {
+                      echo "## NVDA Add-on Store Submission"
+                      echo "- Skipped: ADDON_DATASTORE_TOKEN is not configured"
+                    } >> "$GITHUB_STEP_SUMMARY"
+                    exit 0
+                  fi
+
+                  ADDON_FILE=$(ls -1 *.nvda-addon | head -n 1)
+                  if [ -z "$ADDON_FILE" ]; then
+                    echo "No .nvda-addon file found."
+                    exit 1
+                  fi
+
+                  DOWNLOAD_URL="${REPO_URL}/releases/download/${TAG_NAME}/${ADDON_FILE}"
+
+                  # Channel in add-on store submission form is stable/beta/dev.
+                  # EnhancedDictionaries uses stable releases for tagged builds.
+                  CHANNEL="stable"
+
+                  ISSUE_TITLE="[Submit add-on]: ${ADDON_FILE}"
+                  ISSUE_BODY=$(printf '### Download URL\n%s\n\n### Source URL\n%s\n\n### Publisher\n%s\n\n### Channel\n%s\n\n### License Name\n%s\n\n### License URL\n%s\n' \
+                    "$DOWNLOAD_URL" \
+                    "$REPO_URL" \
+                    "Marlon Sousa" \
+                    "$CHANNEL" \
+                    "Mit License" \
+                    "https://github.com/marlon-sousa/EnhancedDictionaries/blob/master/LICENSE")
+
+                  ISSUE_URL=$(gh issue create \
+                    --repo nvaccess/addon-datastore \
+                    --title "$ISSUE_TITLE" \
+                    --label autoSubmissionFromIssue \
+                    --body "$ISSUE_BODY")
+
+                  echo "Created datastore issue: ${ISSUE_URL}"
+                  echo "addon_datastore_issue_url=${ISSUE_URL}" >> "$GITHUB_OUTPUT"
+
+                  {
+                    echo "## NVDA Add-on Store Submission"
+                    echo "- Datastore issue: ${ISSUE_URL}"
+                    echo "- Release tag: ${TAG_NAME}"
+                    echo "- Workflow run: ${REPO_URL}/actions/runs/${GITHUB_RUN_ID}"
+                  } >> "$GITHUB_STEP_SUMMARY"

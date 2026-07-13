@@ -20,6 +20,11 @@ msgstr ""
 msgid "&import entries from default profile dictionary"
 msgstr "&імпортувати записи зі словника стандартного профілю"
 
+#. Translators: The name of the "keep the profile dictionary in sync" checkbox
+#: addon\globalPlugins\EnhancedDictionaries\guiHelper.py:180
+msgid "&Sync entries with default profile dictionary"
+msgstr "&Синхронізувати записи зі словником стандартного профілю"
+
 #: buildVars.py:19
 msgid "Enhanced dictionaries processing for NVDA"
 msgstr "Розширена обробка словників для NVDA"

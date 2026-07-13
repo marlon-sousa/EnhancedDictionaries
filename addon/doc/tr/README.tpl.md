@@ -58,6 +58,14 @@ Eğer yaparlarsa, yeni sözlük etkili olacaktır. İletişim kutusunu iptal ede
     - Düzenlenmekte olan sözlükte varsayılan (veya sesli) sözlükten bir girdi bulunursa, mevcut girdinin üzerine yazmaz.
     - İçe aktarma, yeni girdileri diske kaydetmez. Yalnızca içe aktarılan girdileri sözlük iletişim kutusundaki girdiler listesine ekler. Odak listeye yerleştirilir ve kullanıcı, sanki hepsini elle yazmış gibi yeni giriş listesini gözden geçirme fırsatına sahip olur.
 
+* Alternatif olarak, "Girdileri varsayılan profil sözlüğüyle eşitle" onay kutusunu işaretleyerek bir profilin sözlüğünü varsayılan profil sözlüğüyle sürekli eşitlenmiş tutabilirsiniz.
+
+    İçe aktarma düğmesinden farklı olarak (o, açık ve tek seferlik bir kopyalamadır), bu, aşağıdaki şekilde davranan canlı bir katmandır:
+
+    - Varsayılan profilin girdileri, profilin sözlüğüne hiç yazılmadan bu profil için etkili olur, dolayısıyla girdiler listesinde görünmezler.
+    - Girdiler, konuşma işlenirken birleştirilir: profile özel girdileriniz önceliklidir ve kalıbını geçersiz kılmadığınız her varsayılan profil girdisi bunların üzerine uygulanır.
+    - Canlı bir referans olduğundan, varsayılan profil sözlüğüne bir girdi eklemek veya değiştirmek, eşitlenmiş her profil tarafından otomatik olarak alınır; yineleme olmaz ve yeniden içe aktarılacak bir şey kalmaz.
+
 *  Kullanıcı belirli bir profilde bir sözlük oluşturduğunda, o profil için hemen etkilidir.
 * Bir profil değiştiğinde, belirli sözlükler (varsayılan ve ses) hemen etkinleşir. Bu sözlükler yoksa, varsayılan profil birininki kullanılır.
 * Yerleşik ve geçici sözlükler etkilenmezler, profillere bağımlı değildirler, ikincisi geçici olduğu için, birincisi yerleşik olduğu için.

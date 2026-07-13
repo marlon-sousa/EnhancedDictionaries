@@ -30,6 +30,11 @@ msgstr "NVDA için geliştirilmiş sözlükler işleme"
 msgid "&import entries from default profile dictionary"
 msgstr "Girişleri varsayılan sözlük profilinden &içe aktar"
 
+#. Translators: The name of the "keep the profile dictionary in sync" checkbox
+#: addon\globalPlugins\EnhancedDictionaries\guiHelper.py:180
+msgid "&Sync entries with default profile dictionary"
+msgstr "&Girdileri varsayılan profil sözlüğüyle eşitle"
+
 #. Add-on description
 #. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
 #: buildVars.py:20

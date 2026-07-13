@@ -58,6 +58,14 @@ Basta instalar el complemento. Cuando está habilitado, notarás los siguientes 
     - Si se encuentra una entrada de diccionario predeterminado (o voz) en el diccionario que se está editando, no reemplazará la entrada actual.
     - La importación no guarda las nuevas entradas en el disco. Ella solo añade entradas importadas en la lista de entradas en el cuadro de diálogo del diccionario. El foco se coloca en la lista y el usuario tiene la oportunidad de revisar la nueva lista de entradas, como si lo había digitado manualmente todas ellas.
 
+* Alternativamente, puedes mantener el diccionario de un perfil sincronizado de forma continua con el diccionario del perfil predeterminado marcando la casilla "Sincronizar entradas con el diccionario del perfil predeterminado".
+
+    A diferencia del botón de importar, que es una copia puntual y explícita, esta es una superposición en vivo que se comporta de la siguiente manera:
+
+    - Las entradas del perfil predeterminado tienen efecto para este perfil sin que nunca se escriban en el diccionario del perfil, por lo que no aparecerán en la lista de entradas.
+    - Las entradas se combinan cuando se procesa el habla: tus entradas específicas del perfil tienen prioridad, y cualquier entrada del perfil predeterminado cuyo patrón no hayas sobrescrito se aplica por encima de ellas.
+    - Como es una referencia en vivo, al añadir o cambiar una entrada en el diccionario del perfil predeterminado, cada perfil sincronizado la toma automáticamente, sin duplicación y sin nada que volver a importar.
+
 * Cada vez que el usuario crea un diccionario en un perfil específico, se asocia inmediatamente con este perfil.
 * Siempre que cambie un perfil, los diccionarios específicos (predeterminado y voz) están activos de inmediato. Si estos diccionarios no existen, los del perfil predeterminado se utilizan.
 * Los diccionarios internos y temporales de NVDA no se ven afectados, ya que no dependen de los perfiles, lo último por ser temporal y el primero por ser interno.

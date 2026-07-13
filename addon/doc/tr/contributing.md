@@ -4,13 +4,30 @@
 
 İhtiyacınız olacak:
 
-* Python 3.6 veya üzeri.
+* Python 3.13 veya üzeri.
 * pip yapılandırılmalıdır
 * scons (pip kurulumu scons)
 * markdown (pip kurulumu markdown)
-* msgfmt yardımcı programı. Bunu elde etmenin en kolay yolu, git bash'i kurmak ve komut istemine bash araçlarını dahil etmeyi seçmektir.
+* gettext; `msgfmt` ve `xgettext` araçlarını sağlar. `msgfmt` her derlemede çeviri dosyalarını derler ve `xgettext`, çeviri şablonunu oluşturmak için `scons pot` tarafından kullanılır. Windows'ta, [gettext-iconv-windows](https://github.com/mlocati/gettext-iconv-windows/releases) adresinden modern bir sürüm yükleyin (veya `scoop install gettext` / `choco install gettext` kullanın) ve `bin` dizininin PATH'inizde diğer gettext'lerden önce geldiğinden emin olun. GnuWin32 gettext paketini kullanmayın: 0.14.4 (2005) sürümünde donmuştur ve bu derleme için çok eskidir (`scons pot`, desteklenmeyen `--package-name` seçeneği nedeniyle başarısız olur).
 
 Her şeyi yükledikten sonra, projenin kökünde scons yayınlamak, eklentiyi oluşturmalı ve dokümanlar oluşturmalıdır.
+
+### Pre-commit
+
+pre-commit'i yüklemeniz şiddetle önerilir.
+
+* pip install pre-commit
+* pre-commit install
+
+Bu, pre-commit'i yükler ve kancalarını (hooks) yapılandırır; böylece her commit yaptığınızda birkaç denetim uygulanır. Bunlardan herhangi biri başarısız olursa commit'e izin verilmez.
+
+"pre-commit run --all-files" komutunu çalıştırarak pre-commit denetimlerini commit yapmadan istediğiniz zaman çalıştırabilirsiniz.
+
+### Flake8
+
+pre-commit kancalarından biri, diğer şeylerin yanı sıra projenin tutarlı bir biçimlendirmeye sahip olmasını ve iyi uygulamaların yerinde olmasını sağlamaya yardımcı olan bir Python linter'ı olan Flake8'dir.
+
+pre-commit Flake8 kancası, `flake8.ini` dosyasındaki aynı yapılandırmayı kullanır.
 
 ## çeviriler
 

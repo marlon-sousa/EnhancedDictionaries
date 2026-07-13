@@ -11,3 +11,5 @@ addon/doc/**/*.md
 *.py[co]
 *.nvda-addon
 .sconsign.dblite
+.playwright-mcp/
+test-results/

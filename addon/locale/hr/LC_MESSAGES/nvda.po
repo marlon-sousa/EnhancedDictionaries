@@ -25,6 +25,11 @@ msgstr ""
 msgid "&import entries from default profile dictionary"
 msgstr "&Uvoz unosa iz zadanog rječnika profila"
 
+#. Translators: The name of the "keep the profile dictionary in sync" checkbox
+#: addon\globalPlugins\EnhancedDictionaries\guiHelper.py:180
+msgid "&Sync entries with default profile dictionary"
+msgstr "&Sinkroniziraj unose sa zadanim profilom rječnika"
+
 #. Add-on summary, usually the user visible name of the addon.
 #. Translators: Summary for this add-on to be shown on installation and add-on information.
 #: buildVars.py:19
