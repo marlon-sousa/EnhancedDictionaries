@@ -10,6 +10,7 @@ from . import dictHelper
 from . import guiHelper
 import globalPluginHandler
 import globalVars
+import gui
 from logHandler import log
 import speechDictHandler
 
@@ -32,6 +33,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def __init__(self, *args, **kwargs):
 		super(GlobalPlugin, self).__init__(*args, **kwargs)
+		self._originalMainFrameDictionaryCommands = {}
+		self._patchedMainFrameDictionaryCommands = {}
 		if globalVars.appArgs.secure:
 			log.info("EnhancedDictionaries addon will not activate on secure screens")
 			return
@@ -61,13 +64,15 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		# so the reactor reapplies the profile voice overlay on top of it.
 		self._originalLoadVoiceDict = speechDictHandler.loadVoiceDict
 		speechDictHandler.loadVoiceDict = self._loadVoiceDictAndRebuild
-		# redirect menus to show the enhanced dictionaries dialog
+		# redirect both dictionary gestures and menus to the enhanced dictionaries dialog
+		self._patchMainFrameDictionaryCommands()
 		self.patchMenus()
 		# build the initial overlay for the currently active profile
 		dictHelper.dictionariesChanged.notify()
 
 	def terminate(self):
 		if not globalVars.appArgs.secure:
+			self._restoreMainFrameDictionaryCommands()
 			try:
 				speechDictHandler.loadVoiceDict = self._originalLoadVoiceDict
 				config.post_configProfileSwitch.unregister(self._onProfileSwitch)
@@ -87,6 +92,66 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		# when synthDriverHandler.getSynth() would not yet return it.
 		self._originalLoadVoiceDict(synth)
 		dictHelper.dictionariesChanged.notify(synth=synth)
+
+	def _patchMainFrameDictionaryCommands(self):
+		if self._originalMainFrameDictionaryCommands:
+			return True
+
+		mainFrame = getattr(gui, "mainFrame", None)
+		if mainFrame is None:
+			log.warning("could not patch dictionary commands because gui.mainFrame is not available")
+			return False
+
+		patchedCommands = {
+			"onDefaultDictionaryCommand": self.onDefaultDictionaryCommand,
+			"onVoiceDictionaryCommand": self.onVoiceDictionaryCommand,
+		}
+		originalCommands = {}
+		for commandName in patchedCommands:
+			originalCommand = getattr(mainFrame, commandName, None)
+			if originalCommand is None:
+				log.warning(f"could not patch missing mainFrame command {commandName}")
+				return False
+			originalCommands[commandName] = originalCommand
+
+		patchedCommandNames = []
+		try:
+			for commandName, patchedCommand in patchedCommands.items():
+				setattr(mainFrame, commandName, patchedCommand)
+				patchedCommandNames.append(commandName)
+		except Exception:
+			for commandName in reversed(patchedCommandNames):
+				setattr(mainFrame, commandName, originalCommands[commandName])
+			log.error("error while patching EnhancedDictionaries mainFrame commands", exc_info=True)
+			return False
+
+		self._originalMainFrameDictionaryCommands = originalCommands
+		self._patchedMainFrameDictionaryCommands = patchedCommands
+		return True
+
+	def _restoreMainFrameDictionaryCommands(self):
+		if not self._originalMainFrameDictionaryCommands:
+			return
+
+		mainFrame = getattr(gui, "mainFrame", None)
+		if mainFrame is None:
+			log.warning("could not restore dictionary commands because gui.mainFrame is not available")
+			self._originalMainFrameDictionaryCommands.clear()
+			self._patchedMainFrameDictionaryCommands.clear()
+			return
+
+		for commandName, originalCommand in self._originalMainFrameDictionaryCommands.items():
+			patchedCommand = self._patchedMainFrameDictionaryCommands.get(commandName)
+			currentCommand = getattr(mainFrame, commandName, None)
+			if currentCommand is patchedCommand:
+				setattr(mainFrame, commandName, originalCommand)
+			else:
+				log.debug(
+					f"not restoring {commandName} because it is no longer owned by EnhancedDictionaries"
+				)
+
+		self._originalMainFrameDictionaryCommands.clear()
+		self._patchedMainFrameDictionaryCommands.clear()
 
 	def patchMenus(self):
 		standardDictionaryMenu = guiHelper.getDefaultDictionaryMenu()
