@@ -31,10 +31,14 @@ addonHandler.initTranslation()
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
+	_DICT_COMMANDS = (
+		"onDefaultDictionaryCommand",
+		"onVoiceDictionaryCommand",
+	)
+
 	def __init__(self, *args, **kwargs):
 		super(GlobalPlugin, self).__init__(*args, **kwargs)
 		self._originalMainFrameDictionaryCommands = {}
-		self._patchedMainFrameDictionaryCommands = {}
 		if globalVars.appArgs.secure:
 			log.info("EnhancedDictionaries addon will not activate on secure screens")
 			return
@@ -72,8 +76,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def terminate(self):
 		if not globalVars.appArgs.secure:
-			self._restoreMainFrameDictionaryCommands()
 			try:
+				self._restoreMainFrameDictionaryCommands()
 				speechDictHandler.loadVoiceDict = self._originalLoadVoiceDict
 				config.post_configProfileSwitch.unregister(self._onProfileSwitch)
 				dictHelper.dictionariesChanged.unregister(self._rebuildMemorySources)
@@ -130,28 +134,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		return True
 
 	def _restoreMainFrameDictionaryCommands(self):
-		if not self._originalMainFrameDictionaryCommands:
-			return
-
-		mainFrame = getattr(gui, "mainFrame", None)
-		if mainFrame is None:
-			log.warning("could not restore dictionary commands because gui.mainFrame is not available")
-			self._originalMainFrameDictionaryCommands.clear()
-			self._patchedMainFrameDictionaryCommands.clear()
-			return
-
-		for commandName, originalCommand in self._originalMainFrameDictionaryCommands.items():
-			patchedCommand = self._patchedMainFrameDictionaryCommands.get(commandName)
-			currentCommand = getattr(mainFrame, commandName, None)
-			if currentCommand is patchedCommand:
-				setattr(mainFrame, commandName, originalCommand)
-			else:
-				log.debug(
-					f"not restoring {commandName} because it is no longer owned by EnhancedDictionaries"
-				)
-
+		for name, original in self._originalMainFrameDictionaryCommands.items():
+			setattr(gui.mainFrame, name, original)
 		self._originalMainFrameDictionaryCommands.clear()
-		self._patchedMainFrameDictionaryCommands.clear()
 
 	def patchMenus(self):
 		standardDictionaryMenu = guiHelper.getDefaultDictionaryMenu()
