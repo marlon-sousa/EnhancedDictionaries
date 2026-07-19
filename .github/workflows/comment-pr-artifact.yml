@@ -31,14 +31,34 @@ jobs:
                           || `${context.serverUrl}/${owner}/${repo}/actions/runs/${runId}`;
                       const conclusion = workflowRun.conclusion || 'unknown';
 
-                      // workflow_run.pull_requests is empty for fork PRs, so
-                      // resolve the PR from the head commit instead.
-                      const associated = await github.paginate(
-                          github.rest.repos.listPullRequestsAssociatedWithCommit,
-                          { owner, repo, commit_sha: commitSha },
-                      );
-                      const pullRequest = associated.find((pr) => pr.state === 'open')
-                          || associated[0];
+                      // workflow_run.pull_requests is empty for fork PRs, and
+                      // listPullRequestsAssociatedWithCommit does not resolve a
+                      // fork's head commit either. Searching open PRs by the
+                      // head repo owner + branch is the reliable path for forks.
+                      const headBranch = workflowRun.head_branch;
+                      const headOwner = workflowRun.head_repository?.owner?.login;
+
+                      let pullRequest = null;
+                      if (headOwner && headBranch) {
+                          const openPrs = await github.paginate(github.rest.pulls.list, {
+                              owner,
+                              repo,
+                              state: 'open',
+                              head: `${headOwner}:${headBranch}`,
+                              per_page: 100,
+                          });
+                          pullRequest = openPrs.find((pr) => pr.head.sha === commitSha)
+                              || openPrs[0];
+                      }
+                      if (!pullRequest) {
+                          // Fallback for same-repo PRs.
+                          const associated = await github.paginate(
+                              github.rest.repos.listPullRequestsAssociatedWithCommit,
+                              { owner, repo, commit_sha: commitSha },
+                          );
+                          pullRequest = associated.find((pr) => pr.state === 'open')
+                              || associated[0];
+                      }
 
                       if (!pullRequest) {
                           core.info(`No pull request found for commit ${shortSha}.`);
