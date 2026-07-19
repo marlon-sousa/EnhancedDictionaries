@@ -12,7 +12,7 @@ permissions:
 
 jobs:
     comment_packaged_artifact:
-        if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+        if: github.event.workflow_run.event == 'pull_request'
         runs-on: ubuntu-latest
         steps:
             - name: Upsert packaged artifact link on PR
@@ -32,6 +32,7 @@ jobs:
                       const runUrl = workflowRun.html_url || `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
                       const commitSha = workflowRun.head_sha || context.sha;
                       const shortSha = commitSha.slice(0, 7);
+                      const conclusion = workflowRun.conclusion || 'unknown';
 
                       const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
                           owner: context.repo.owner,
@@ -43,12 +44,15 @@ jobs:
                       const packagedArtifact = artifacts.find((artifact) => !artifact.expired && artifact.name === 'packaged_addon');
                       const artifactLine = packagedArtifact
                           ? `- Artifact: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}/artifacts/${packagedArtifact.id}`
-                          : '- Artifact: not available (check the run page below)';
+                          : conclusion === 'success'
+                              ? '- Artifact: not available (check the run page below)'
+                              : `- Artifact: not available because PR Checks concluded with "${conclusion}"`;
 
                       const body = [
                           marker,
                           '### Packaged add-on artifact',
                           `- Commit: ${shortSha} (${commitSha})`,
+                          `- PR Checks conclusion: ${conclusion}`,
                           artifactLine,
                           `- Run: ${runUrl}`,
                       ].join('\n');
