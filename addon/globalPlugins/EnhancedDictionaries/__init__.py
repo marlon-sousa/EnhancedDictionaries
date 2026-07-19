@@ -98,40 +98,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		dictHelper.dictionariesChanged.notify(synth=synth)
 
 	def _patchMainFrameDictionaryCommands(self):
-		if self._originalMainFrameDictionaryCommands:
-			return True
-
-		mainFrame = getattr(gui, "mainFrame", None)
-		if mainFrame is None:
-			log.warning("could not patch dictionary commands because gui.mainFrame is not available")
-			return False
-
-		patchedCommands = {
-			"onDefaultDictionaryCommand": self.onDefaultDictionaryCommand,
-			"onVoiceDictionaryCommand": self.onVoiceDictionaryCommand,
-		}
-		originalCommands = {}
-		for commandName in patchedCommands:
-			originalCommand = getattr(mainFrame, commandName, None)
-			if originalCommand is None:
-				log.warning(f"could not patch missing mainFrame command {commandName}")
-				return False
-			originalCommands[commandName] = originalCommand
-
-		patchedCommandNames = []
-		try:
-			for commandName, patchedCommand in patchedCommands.items():
-				setattr(mainFrame, commandName, patchedCommand)
-				patchedCommandNames.append(commandName)
-		except Exception:
-			for commandName in reversed(patchedCommandNames):
-				setattr(mainFrame, commandName, originalCommands[commandName])
-			log.error("error while patching EnhancedDictionaries mainFrame commands", exc_info=True)
-			return False
-
-		self._originalMainFrameDictionaryCommands = originalCommands
-		self._patchedMainFrameDictionaryCommands = patchedCommands
-		return True
+		for name in self._DICT_COMMANDS:
+			self._originalMainFrameDictionaryCommands[name] = getattr(gui.mainFrame, name)
+			setattr(gui.mainFrame, name, getattr(self, name))
 
 	def _restoreMainFrameDictionaryCommands(self):
 		for name, original in self._originalMainFrameDictionaryCommands.items():
