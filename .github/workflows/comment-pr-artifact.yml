@@ -1,0 +1,136 @@
+name: Comment PR Artifact
+
+on:
+    workflow_run:
+        workflows: ["PR Checks"]
+        types: [completed]
+
+permissions:
+    actions: read
+    contents: read
+    pull-requests: write
+
+jobs:
+    comment_packaged_artifact:
+        if: github.event.workflow_run.event == 'pull_request'
+        runs-on: ubuntu-latest
+        steps:
+            - name: Upsert packaged artifact links on PR
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const marker = '<!-- packaged-addon-artifact-comment -->';
+                      const owner = context.repo.owner;
+                      const repo = context.repo.repo;
+                      const workflowRun = context.payload.workflow_run;
+
+                      const commitSha = workflowRun.head_sha || context.sha;
+                      const shortSha = commitSha.slice(0, 7);
+                      const runId = workflowRun.id;
+                      const runUrl = workflowRun.html_url
+                          || `${context.serverUrl}/${owner}/${repo}/actions/runs/${runId}`;
+                      const conclusion = workflowRun.conclusion || 'unknown';
+
+                      // workflow_run.pull_requests is empty for fork PRs, so
+                      // resolve the PR from the head commit instead.
+                      const associated = await github.paginate(
+                          github.rest.repos.listPullRequestsAssociatedWithCommit,
+                          { owner, repo, commit_sha: commitSha },
+                      );
+                      const pullRequest = associated.find((pr) => pr.state === 'open')
+                          || associated[0];
+
+                      if (!pullRequest) {
+                          core.info(`No pull request found for commit ${shortSha}.`);
+                          return;
+                      }
+                      const issue_number = pullRequest.number;
+
+                      // Find the packaged add-on artifact. Its name is the dated
+                      // .nvda-addon file name produced by the build.
+                      const artifacts = await github.paginate(
+                          github.rest.actions.listWorkflowRunArtifacts,
+                          { owner, repo, run_id: runId, per_page: 100 },
+                      );
+                      const packagedArtifact =
+                          artifacts.find((a) => !a.expired && a.name.endsWith('.nvda-addon'))
+                          || artifacts.find((a) => !a.expired && a.name === 'packaged_addon');
+
+                      const addonName = packagedArtifact
+                          ? packagedArtifact.name
+                          : `packaged add-on (${shortSha})`;
+                      const artifactUrl = packagedArtifact
+                          ? `${context.serverUrl}/${owner}/${repo}/actions/runs/${runId}/artifacts/${packagedArtifact.id}`
+                          : null;
+                      const dateStamp = new Date(workflowRun.updated_at || Date.now())
+                          .toISOString()
+                          .slice(0, 10);
+
+                      const artifactLine = artifactUrl
+                          ? `- Artifact: [\`${addonName}\`](${artifactUrl})`
+                          : conclusion === 'success'
+                              ? '- Artifact: not available (check the run page below)'
+                              : `- Artifact: not available because PR Checks concluded with "${conclusion}"`;
+
+                      // One level-3 section per commit/build. A per-entry marker
+                      // lets us update the section for a re-run of the same commit.
+                      const entry = [
+                          `<!-- entry:${commitSha} -->`,
+                          `### \`${addonName}\``,
+                          `- Commit: ${shortSha} (${commitSha})`,
+                          `- Date: ${dateStamp}`,
+                          `- PR Checks conclusion: ${conclusion}`,
+                          artifactLine,
+                          `- Run: ${runUrl}`,
+                      ].join('\n');
+
+                      const header = `${marker}\n## Packaged add-on artifacts`;
+                      const MAX_ENTRIES = 20;
+
+                      const comments = await github.paginate(github.rest.issues.listComments, {
+                          owner,
+                          repo,
+                          issue_number,
+                          per_page: 100,
+                      });
+                      const existing = comments.find((c) =>
+                          c.user?.type === 'Bot' &&
+                          typeof c.body === 'string' &&
+                          c.body.includes(marker),
+                      );
+
+                      // Keep older entries (newest first), dropping any previous
+                      // entry for this same commit so it gets replaced.
+                      let entries = [];
+                      if (existing) {
+                          const parts = existing.body.split(/(?=<!-- entry:[0-9a-f]+ -->)/);
+                          for (const part of parts) {
+                              const m = part.match(/<!-- entry:([0-9a-f]+) -->/);
+                              if (m && m[1] !== commitSha) {
+                                  entries.push(part.trim());
+                              }
+                          }
+                      }
+                      entries.unshift(entry);
+                      entries = entries.slice(0, MAX_ENTRIES);
+
+                      const body = [header, ...entries].join('\n\n');
+
+                      if (existing) {
+                          await github.rest.issues.updateComment({
+                              owner,
+                              repo,
+                              comment_id: existing.id,
+                              body,
+                          });
+                          core.info(`Updated unified artifact comment ${existing.id}.`);
+                          return;
+                      }
+
+                      await github.rest.issues.createComment({
+                          owner,
+                          repo,
+                          issue_number,
+                          body,
+                      });
+                      core.info('Created unified artifact comment.');
