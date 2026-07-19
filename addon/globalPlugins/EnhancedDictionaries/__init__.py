@@ -10,6 +10,7 @@ from . import dictHelper
 from . import guiHelper
 import globalPluginHandler
 import globalVars
+import gui
 from logHandler import log
 import speechDictHandler
 
@@ -30,8 +31,14 @@ addonHandler.initTranslation()
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
+	_DICT_COMMANDS = (
+		"onDefaultDictionaryCommand",
+		"onVoiceDictionaryCommand",
+	)
+
 	def __init__(self, *args, **kwargs):
 		super(GlobalPlugin, self).__init__(*args, **kwargs)
+		self._originalMainFrameDictionaryCommands = {}
 		if globalVars.appArgs.secure:
 			log.info("EnhancedDictionaries addon will not activate on secure screens")
 			return
@@ -61,7 +68,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		# so the reactor reapplies the profile voice overlay on top of it.
 		self._originalLoadVoiceDict = speechDictHandler.loadVoiceDict
 		speechDictHandler.loadVoiceDict = self._loadVoiceDictAndRebuild
-		# redirect menus to show the enhanced dictionaries dialog
+		# redirect both dictionary gestures and menus to the enhanced dictionaries dialog
+		self._patchMainFrameDictionaryCommands()
 		self.patchMenus()
 		# build the initial overlay for the currently active profile
 		dictHelper.dictionariesChanged.notify()
@@ -69,6 +77,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def terminate(self):
 		if not globalVars.appArgs.secure:
 			try:
+				self._restoreMainFrameDictionaryCommands()
 				speechDictHandler.loadVoiceDict = self._originalLoadVoiceDict
 				config.post_configProfileSwitch.unregister(self._onProfileSwitch)
 				dictHelper.dictionariesChanged.unregister(self._rebuildMemorySources)
@@ -87,6 +96,16 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		# when synthDriverHandler.getSynth() would not yet return it.
 		self._originalLoadVoiceDict(synth)
 		dictHelper.dictionariesChanged.notify(synth=synth)
+
+	def _patchMainFrameDictionaryCommands(self):
+		for name in self._DICT_COMMANDS:
+			self._originalMainFrameDictionaryCommands[name] = getattr(gui.mainFrame, name)
+			setattr(gui.mainFrame, name, getattr(self, name))
+
+	def _restoreMainFrameDictionaryCommands(self):
+		for name, original in self._originalMainFrameDictionaryCommands.items():
+			setattr(gui.mainFrame, name, original)
+		self._originalMainFrameDictionaryCommands.clear()
 
 	def patchMenus(self):
 		standardDictionaryMenu = guiHelper.getDefaultDictionaryMenu()
