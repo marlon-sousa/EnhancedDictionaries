@@ -1,0 +1,87 @@
+name: Comment PR Artifact
+
+on:
+    workflow_run:
+        workflows: ["PR Checks"]
+        types: [completed]
+
+permissions:
+    actions: read
+    contents: read
+    pull-requests: write
+
+jobs:
+    comment_packaged_artifact:
+        if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+        runs-on: ubuntu-latest
+        steps:
+            - name: Upsert packaged artifact link on PR
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const marker = '<!-- packaged-addon-artifact-comment -->';
+                      const workflowRun = context.payload.workflow_run;
+                      const pullRequest = workflowRun.pull_requests?.[0];
+
+                      if (!pullRequest) {
+                          core.info('No pull request associated with this workflow run.');
+                          return;
+                      }
+
+                      const runId = workflowRun.id;
+                      const runUrl = workflowRun.html_url || `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
+                      const commitSha = workflowRun.head_sha || context.sha;
+                      const shortSha = commitSha.slice(0, 7);
+
+                      const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          run_id: runId,
+                          per_page: 100,
+                      });
+
+                      const packagedArtifact = artifacts.find((artifact) => !artifact.expired && artifact.name === 'packaged_addon');
+                      const artifactLine = packagedArtifact
+                          ? `- Artifact: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}/artifacts/${packagedArtifact.id}`
+                          : '- Artifact: not available (check the run page below)';
+
+                      const body = [
+                          marker,
+                          '### Packaged add-on artifact',
+                          `- Commit: ${shortSha} (${commitSha})`,
+                          artifactLine,
+                          `- Run: ${runUrl}`,
+                      ].join('\n');
+
+                      const issue_number = pullRequest.number;
+                      const comments = await github.paginate(github.rest.issues.listComments, {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number,
+                          per_page: 100,
+                      });
+
+                      const existing = comments.find((comment) =>
+                          comment.user?.type === 'Bot' &&
+                          typeof comment.body === 'string' &&
+                          comment.body.includes(marker),
+                      );
+
+                      if (existing) {
+                          await github.rest.issues.updateComment({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              comment_id: existing.id,
+                              body,
+                          });
+                          core.info(`Updated existing artifact comment: ${existing.id}`);
+                          return;
+                      }
+
+                      await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number,
+                          body,
+                      });
+                      core.info('Created new artifact comment.');
