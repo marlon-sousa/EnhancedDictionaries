@@ -43,17 +43,34 @@ jobs:
               run: pre-commit run --all-files
 
             - name: Build addon and pot
+              id: build
+              env:
+                  UPLOAD_ARTIFACTS: ${{ inputs.upload_artifacts }}
               run: |
                   rm -f *.nvda-addon *.pot || true
                   scons
                   scons pot
+                  # For uploaded PR artifacts, stamp the build date into the
+                  # file name (e.g. addon-1.2.3_20260719.nvda-addon) so each
+                  # build is easy to tell apart. Release builds are produced
+                  # separately by release.yml and keep their clean name.
+                  if [ "$UPLOAD_ARTIFACTS" = "true" ]; then
+                      builtAddon="$(ls -1 *.nvda-addon | head -n 1)"
+                      dateStamp="$(date -u +%Y%m%d)"
+                      datedAddon="${builtAddon%.nvda-addon}_${dateStamp}.nvda-addon"
+                      if [ "$builtAddon" != "$datedAddon" ]; then
+                          mv "$builtAddon" "$datedAddon"
+                      fi
+                      echo "addon_file=$datedAddon" >> "$GITHUB_OUTPUT"
+                      echo "Packaged $datedAddon"
+                  fi
 
             - name: Upload build artifacts
               id: upload_build_artifacts
               if: ${{ inputs.upload_artifacts }}
               uses: actions/upload-artifact@v4
               with:
-                  name: packaged_addon
+                  name: ${{ steps.build.outputs.addon_file }}
                   retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
                   path: |
                       ./*.nvda-addon
