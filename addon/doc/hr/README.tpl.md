@@ -85,3 +85,4 @@ Posebna zahvala za
 * Umut KORKMAZ - turski prijevod
 * Tarik Hadžirović - hrvatski prijevod
 * Ivan Shtefuriak - ukrajinski prijevod
+* Victor Tsai - podrška za tipkovničke geste rječnika

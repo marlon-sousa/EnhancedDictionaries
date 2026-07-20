@@ -74,55 +74,7 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: false
 
-      - name: Submit to NVDA Add-on Store
-        id: submit-datastore
-        if: github.repository == 'marlon-sousa/EnhancedDictionaries'
-        env:
-          GH_TOKEN: ${{ secrets.ADDON_DATASTORE_TOKEN }}
-          TAG_NAME: ${{ github.ref_name }}
-          REPO_URL: https://github.com/${{ github.repository }}
-        run: |
-          if [ -z "$GH_TOKEN" ]; then
-            echo "ADDON_DATASTORE_TOKEN is not configured; skipping submission."
-            {
-              echo "## NVDA Add-on Store Submission"
-              echo "- Skipped: ADDON_DATASTORE_TOKEN is not configured"
-            } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-
-          ADDON_FILE=$(ls -1 *.nvda-addon | head -n 1)
-          if [ -z "$ADDON_FILE" ]; then
-            echo "No .nvda-addon file found."
-            exit 1
-          fi
-
-          DOWNLOAD_URL="${REPO_URL}/releases/download/${TAG_NAME}/${ADDON_FILE}"
-
-          # Channel in add-on store submission form is stable/beta/dev.
-          # EnhancedDictionaries uses stable releases for tagged builds.
-          CHANNEL="stable"
-
-          ISSUE_TITLE="[Submit add-on]: ${ADDON_FILE}"
-          ISSUE_BODY=$(printf '### Download URL\n%s\n\n### Source URL\n%s\n\n### Publisher\n%s\n\n### Channel\n%s\n\n### License Name\n%s\n\n### License URL\n%s\n' \
-            "$DOWNLOAD_URL" \
-            "$REPO_URL" \
-            "Marlon Sousa" \
-            "$CHANNEL" \
-            "Mit License" \
-            "https://github.com/marlon-sousa/EnhancedDictionaries/blob/master/LICENSE")
-
-          ISSUE_URL=$(gh issue create \
-            --repo nvaccess/addon-datastore \
-            --title "$ISSUE_TITLE" \
-            --body "$ISSUE_BODY")
-
-          echo "Created datastore issue: ${ISSUE_URL}"
-          echo "addon_datastore_issue_url=${ISSUE_URL}" >> "$GITHUB_OUTPUT"
-
-          {
-            echo "## NVDA Add-on Store Submission"
-            echo "- Datastore issue: ${ISSUE_URL}"
-            echo "- Release tag: ${TAG_NAME}"
-            echo "- Workflow run: ${REPO_URL}/actions/runs/${GITHUB_RUN_ID}"
-          } >> "$GITHUB_STEP_SUMMARY"
+      # Add-on store submission is intentionally NOT automated here.
+      # NV Access rejects submissions created through the gh CLI / freeform
+      # issue bodies; the registerAddon issue form must be filled in a browser.
+      # Use the `submit-nvda-addon` skill after the release is published.

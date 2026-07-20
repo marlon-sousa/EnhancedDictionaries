@@ -85,3 +85,4 @@ Remerciement spécial à
 *  Thiago Seus - Traduction Portugais Brésil
 * Umut KORKMAZ - Traduction turc
 * Ivan Shtefuriak - Traduction Ukrainien
+* Victor Tsai - prise en charge des gestes clavier des dictionnaires
