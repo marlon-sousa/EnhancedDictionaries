@@ -1,4 +1,4 @@
-# EnhancedDictionaries 1.7.0
+# EnhancedDictionaries 1.7.1
 Nvda ADDON for handling more advanced dictionaries processing
 
 ## download
@@ -85,3 +85,4 @@ Special thanks to
 *  Thiago Seus - Brazilian Portuguese translation
 * Umut KORKMAZ - Turkish translation
 * Ivan Shtefuriak - Ukrainian translation
+* Victor Tsai - dictionary keyboard gesture support

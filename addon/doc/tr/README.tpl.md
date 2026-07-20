@@ -85,3 +85,4 @@ Bu eklentiye katkıda bulunmak veya bu eklentiyi çevirmek istiyorsanız, lütfe
 *  Thiago Seus - Brezilya Portekizcesi çeviri
 * Umut KORKMAZ - Türkçe çeviri
 * Ivan Shtefuriak - Ukraynaca çeviri
+* Victor Tsai - sözlük klavye hareketleri desteği

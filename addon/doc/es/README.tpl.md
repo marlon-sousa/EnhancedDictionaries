@@ -85,3 +85,4 @@ Agradecimientos especiales a
 *  Thiago Seus - Traducción Portugués del Brasil
 * Umut KORKMAZ - Traducción turco
 * Ivan Shtefuriak - Traducción al Ucraniano
+* Victor Tsai - compatibilidad con los gestos de teclado de los diccionarios

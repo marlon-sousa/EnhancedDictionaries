@@ -90,3 +90,4 @@ Agradecimentos a:
 *  Thiago Seus - Tradução para Português do Brasil
 * Umut KORKMAZ - tradução para Turco
 * Ivan Shtefuriak - tradução para Ucraniana
+* Victor Tsai - suporte aos gestos de teclado dos dicionários

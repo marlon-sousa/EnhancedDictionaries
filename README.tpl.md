@@ -85,3 +85,4 @@ Special thanks to
 *  Thiago Seus - Brazilian Portuguese translation
 * Umut KORKMAZ - Turkish translation
 * Ivan Shtefuriak - Ukrainian translation
+* Victor Tsai - dictionary keyboard gesture support
