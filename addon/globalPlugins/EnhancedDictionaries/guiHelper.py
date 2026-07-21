@@ -94,7 +94,6 @@ def showEnhancedDictionaryDialog(dic, title=None):
 # if a dictionary is being created (it does not exist on disc) it is activated imediately
 # after the dialog closes
 class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
-	PATTERN_COL = 1
 	keepUpdatedCheckBox = False
 
 	def __init__(self, parent, title, speechDict):
@@ -109,6 +108,13 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 
 	def makeSettings(self, settingsSizer):
 		sHelper = guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
+		# Translators: The label for the filter field in the dictionary dialog.
+		searchLabelText = __("Filter b&y:")
+		self.searchEdit = sHelper.addLabeledControl(
+			searchLabelText,
+			wx.TextCtrl
+		)
+		self.searchEdit.Bind(wx.EVT_TEXT, self.onSearch)
 		# Translators: The label for the list box of dictionary entries in speech dictionary dialog.
 		entriesLabelText = __("&Dictionary entries")
 		self.dictList = sHelper.addLabeledControl(
@@ -130,14 +136,7 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 		# whether the entry is a regular expression, matches whole words, or matches anywhere.
 		self.dictList.InsertColumn(4, __("Type"), width=50)
 		self.offOn = (__("off"), __("on"))
-		for entry in self.tempSpeechDict:
-			self.dictList.Append((
-				entry.comment,
-				entry.pattern,
-				entry.replacement,
-				self.offOn[int(entry.caseSensitive)],
-				EnhancedDictionaryDialog.TYPE_LABELS[entry.type]
-			))
+		self._refreshDictList()
 		self.editingIndex = -1
 
 		bHelper = guiHelper.ButtonHelper(orientation=wx.HORIZONTAL)
@@ -189,11 +188,134 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 				self.keepUpdatedCheckBox.SetValue(savedKeepDictionaryUpdatedCheckboxValue)
 				sHelper.addItem(self.keepUpdatedCheckBox)
 
-	def hasEntry(self, pattern):
-		for row in range(self.dictList.GetItemCount()):
-			if self.dictList.GetItem(row, self.PATTERN_COL).GetText() == pattern:
-				return True
-		return False
+	def _getFilterText(self):
+		searchEdit = getattr(self, "searchEdit", None)
+		if searchEdit is None:
+			return ""
+		return searchEdit.GetValue()
+
+	def _entryMatchesFilter(self, entry, filterText):
+		if not filterText:
+			return True
+		return any(
+			filterText in (value or "").lower()
+			for value in (entry.comment, entry.pattern, entry.replacement)
+		)
+
+	def _refreshDictList(self, selectedEntryIndex=None):
+		"""Rebuild the visible entry list and preserve its mapping to the full dictionary."""
+		filterText = self._getFilterText().lower()
+		self.dictList.DeleteAllItems()
+		selectedRow = -1
+
+		for entryIndex, entry in enumerate(self.tempSpeechDict):
+			if not self._entryMatchesFilter(entry, filterText):
+				continue
+			row = self.dictList.Append((
+				entry.comment,
+				entry.pattern,
+				entry.replacement,
+				self.offOn[int(entry.caseSensitive)],
+				EnhancedDictionaryDialog.TYPE_LABELS[entry.type]
+			))
+			self.dictList.SetItemData(row, entryIndex)
+			if entryIndex == selectedEntryIndex:
+				selectedRow = row
+
+		if selectedRow >= 0:
+			self.dictList.Select(selectedRow)
+			self.dictList.Focus(selectedRow)
+
+	def onSearch(self, evt):
+		self._refreshDictList()
+		evt.Skip()
+
+	def _getSelectedEntryIndex(self):
+		"""Return the selected visible row and its backing dictionary entry index."""
+		if self.dictList.GetSelectedItemCount() != 1:
+			return (-1, -1)
+		rowIndex = self.dictList.GetFirstSelected()
+		if rowIndex < 0:
+			return (-1, -1)
+		try:
+			entryIndex = self.dictList.GetItemData(rowIndex)
+		except (RuntimeError, TypeError):
+			log.debugWarning(
+				"Could not retrieve dictionary entry index from the selected row",
+				exc_info=True
+			)
+			return (-1, -1)
+		if not isinstance(entryIndex, int) or not 0 <= entryIndex < len(self.tempSpeechDict):
+			log.debugWarning(f"Ignoring invalid dictionary entry index: {entryIndex!r}")
+			return (-1, -1)
+		return (rowIndex, entryIndex)
+
+	def onAddClick(self, evt):
+		entryCountBefore = len(self.tempSpeechDict)
+		super().onAddClick(evt)
+		if len(self.tempSpeechDict) == entryCountBefore:
+			return
+		addedEntryIndex = len(self.tempSpeechDict) - 1
+		self._refreshDictList(selectedEntryIndex=addedEntryIndex)
+		self.dictList.SetFocus()
+
+	def onEditClick(self, evt):
+		rowIndex, entryIndex = self._getSelectedEntryIndex()
+		if entryIndex < 0:
+			return
+		entry = self.tempSpeechDict[entryIndex]
+		entryDialog = gui.speechDict.DictionaryEntryDialog(self)
+		entryDialog.patternTextCtrl.SetValue(entry.pattern)
+		entryDialog.replacementTextCtrl.SetValue(entry.replacement)
+		entryDialog.commentTextCtrl.SetValue(entry.comment)
+		entryDialog.caseSensitiveCheckBox.SetValue(entry.caseSensitive)
+		entryDialog.setType(entry.type)
+		if entryDialog.ShowModal() == wx.ID_OK:
+			self.tempSpeechDict[entryIndex] = entryDialog.dictEntry
+			self._refreshDictList(selectedEntryIndex=entryIndex)
+			self.dictList.SetFocus()
+		entryDialog.Destroy()
+
+	def onRemoveClick(self, evt):
+		selectedEntryIndexes = []
+		rowIndex = self.dictList.GetFirstSelected()
+		while rowIndex >= 0:
+			try:
+				entryIndex = self.dictList.GetItemData(rowIndex)
+			except (RuntimeError, TypeError):
+				log.debugWarning(
+					"Could not retrieve dictionary entry index from a selected row",
+					exc_info=True
+				)
+			else:
+				if isinstance(entryIndex, int) and 0 <= entryIndex < len(self.tempSpeechDict):
+					selectedEntryIndexes.append(entryIndex)
+				else:
+					log.debugWarning(f"Ignoring invalid dictionary entry index: {entryIndex!r}")
+			rowIndex = self.dictList.GetNextSelected(rowIndex)
+
+		if not selectedEntryIndexes:
+			return
+		for entryIndex in sorted(set(selectedEntryIndexes), reverse=True):
+			del self.tempSpeechDict[entryIndex]
+		self._refreshDictList()
+		self.dictList.SetFocus()
+
+	def onRemoveAll(self, evt):
+		if (
+			gui.messageBox(
+				# Translators: A prompt for confirmation on the Speech Dictionary dialog.
+				__("Are you sure you want to remove all the entries in this dictionary?"),
+				# Translators: The title on a prompt for confirmation on the Speech Dictionary dialog.
+				__("Remove all"),
+				style=wx.YES | wx.NO | wx.NO_DEFAULT,
+			)
+			!= wx.YES
+		):
+			return
+		del self.tempSpeechDict[:]
+		self._refreshDictList()
+		self.dictList.SetFocus()
 
 	def onOk(self, evt):
 		# super().onOk saves the edited (profile-own on named profiles, global on the
@@ -215,13 +337,5 @@ class EnhancedDictionaryDialog(gui.speechDict.DictionaryDialog):
 		source = SpeechDict()
 		source.load(sourceFileName)
 		self.tempSpeechDict.syncFrom(source)
-		for entry in self.tempSpeechDict:
-			if not self.hasEntry(entry.pattern):
-				self.dictList.Append((
-					entry.comment,
-					entry.pattern,
-					entry.replacement,
-					self.offOn[int(entry.caseSensitive)],
-					EnhancedDictionaryDialog.TYPE_LABELS[entry.type]
-				))
+		self._refreshDictList()
 		self.dictList.SetFocus()
